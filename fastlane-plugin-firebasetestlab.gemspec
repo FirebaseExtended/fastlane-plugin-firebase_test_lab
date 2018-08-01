@@ -1,16 +1,16 @@
 # coding: utf-8
 lib = File.expand_path("../lib", __FILE__)
 $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
-require 'fastlane/plugin/ftl/version'
+require 'fastlane/plugin/firebasetestlab/version'
 
 Gem::Specification.new do |spec|
-  spec.name          = 'fastlane-plugin-ftl'
-  spec.version       = Fastlane::Ftl::VERSION
+  spec.name          = 'fastlane-plugin-firebasetestlab'
+  spec.version       = Fastlane::Firebasetestlab::VERSION
   spec.author        = %q{Shihua Zheng}
   spec.email         = %q{shihuaz@google.com}
 
   spec.summary       = %q{Firebase Test Lab for fastlane}
-  spec.homepage      = "https://github.com/fastlane/fastlane-ftl-plugin"
+  spec.homepage      = "https://github.com/fastlane/fastlane-plugin-ftl"
   spec.license       = "MIT"
 
   spec.files         = Dir["lib/**/*"] + %w(README.md LICENSE)

@@ -1,5 +1,5 @@
 module Fastlane
-  module Ftl
+  module Firebasetestlab
     VERSION = "0.0.1"
   end
 end
