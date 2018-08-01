@@ -1,6 +1,6 @@
 module Fastlane
   module Actions
-    class FirebaseTestLabIosAction < Action
+    class FirebaseTestLabIosXctestAction < Action
       def self.run(params)
       end
 
@@ -9,7 +9,7 @@ module Fastlane
       #####################################################
 
       def self.description
-        "Submit an iOS test job to Firebase Test Lab"
+        "Submit an iOS XCTest job to Firebase Test Lab"
       end
 
       def self.available_options
