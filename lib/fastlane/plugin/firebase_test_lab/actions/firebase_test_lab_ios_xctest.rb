@@ -1,3 +1,5 @@
+require_relative '../options'
+
 module Fastlane
   module Actions
     class FirebaseTestLabIosXctestAction < Action
@@ -13,7 +15,7 @@ module Fastlane
       end
 
       def self.available_options
-        []
+        Fastlane::FirebaseTestLab::Options.available_options
       end
 
       def self.authors
