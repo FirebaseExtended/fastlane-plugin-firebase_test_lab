@@ -21,7 +21,7 @@ module Fastlane
                                        type: Array,
                                        verify_block: proc do |value|
                                          value.each do |current|
-                                           UI.user_error!("Each device must be represented by a Hash object, "\
+                                           UI.user_error!("Each device must be represented by a Hash object, " +
                                              "#{current.class} found") if current.class != Hash
                                            check_has_property(current, :iosModelId)
                                            check_has_property(current, :iosVersionId)
@@ -45,19 +45,19 @@ module Fastlane
                                        default_value: nil,
                                        optional: true,
                                        verify_block: proc do |value|
-                                         UI.user_error!("Invalid GCS path: '#{value}'")
+                                         UI.user_error!("Invalid GCS path: '#{value}'") \
                                            unless value.match(/^gs:\/\/.*\//)
                                        end),
           FastlaneCore::ConfigItem.new(key: :oauth_key_file,
-                                       description: "Use the given Google cloud service key file." \
-                                                    "If not set, application default credential will be used " \
+                                       description: "Use the given Google cloud service key file." +\
+                                                    "If not set, application default credential will be used " +\
                                                     "(see https://cloud.google.com/docs/authentication/production)",
                                        default_value: nil,
                                        optional: true,
                                        verify_block: proc do |value|
                                          v = File.expand_path(value.to_s)
                                          UI.user_error!("Key file not found at path '#{v}'") unless File.exist?(v)
-                                       end)
+                                       end),
         ]
       end
 
