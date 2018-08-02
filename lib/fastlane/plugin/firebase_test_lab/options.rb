@@ -46,7 +46,7 @@ module Fastlane
                                        optional: true,
                                        verify_block: proc do |value|
                                          UI.user_error!("Invalid GCS path: '#{value}'") \
-                                           unless value.match(/^gs:\/\/.*\//)
+                                           unless value.to_s.start_with?("gs://")
                                        end),
           FastlaneCore::ConfigItem.new(key: :oauth_key_file,
                                        description: "Use the given Google cloud service key file." +\
