@@ -1,8 +1,8 @@
 require 'fastlane_core/configuration/config_item'
 
 module Fastlane
-  module Firebasetestlab
-    class Optinos
+  module FirebaseTestLab
+    class Options
       def self.available_options
         [
           FastlaneCore::ConfigItem.new(key: :gcp_project,
@@ -21,7 +21,8 @@ module Fastlane
                                        type: Array,
                                        verify_block: proc do |value|
                                          value.each do |current|
-                                           UI.user_error!("Each device must be represented by a Hash object, #{current.class} found") if current.class != Hash
+                                           UI.user_error!("Each device must be represented by a Hash object, "\
+                                             "#{current.class} found") if current.class != Hash
                                            check_has_property(current, :iosModelId)
                                            check_has_property(current, :iosVersionId)
                                            set_default_property(current, :locale, "en_US")
@@ -44,10 +45,13 @@ module Fastlane
                                        default_value: nil,
                                        optional: true,
                                        verify_block: proc do |value|
-                                         UI.user_error!("Invalid GCS path: '#{value}'") unless value.match(/^gs:\/\/.*\//)
+                                         UI.user_error!("Invalid GCS path: '#{value}'")
+                                           unless value.match(/^gs:\/\/.*\//)
                                        end),
           FastlaneCore::ConfigItem.new(key: :oauth_key_file,
-                                       description: "Use the given Google cloud service key file. If not set, application default credential will be used (see https://cloud.google.com/docs/authentication/production)",
+                                       description: "Use the given Google cloud service key file." \
+                                                    "If not set, application default credential will be used " \
+                                                    "(see https://cloud.google.com/docs/authentication/production)",
                                        default_value: nil,
                                        optional: true,
                                        verify_block: proc do |value|
