@@ -4,7 +4,7 @@ require 'json'
 module Fastlane
   module FirebaseTestLab
     class FirebaseTestLabService
-      TOOLRESULTS_API_ENDPOINT = "https://www.googleapis.com"
+      APIARY_ENDPOINT = "https://www.googleapis.com"
       TOOLRESULTS_GET_SETTINGS_API_V3 = "/toolresults/v1beta3/projects/{project}/settings"
       TOOLRESULTS_INITIALIZE_SETTINGS_API_V3 = "/toolresults/v1beta3/projects/{project}:initializeSettings"
 
@@ -14,7 +14,7 @@ module Fastlane
 
       SCOPES = ["https://www.googleapis.com/auth/cloud-platform"]
 
-      private_constant :TOOLRESULTS_API_ENDPOINT
+      private_constant :APIARY_ENDPOINT
       private_constant :TOOLRESULTS_GET_SETTINGS_API_V3
       private_constant :TOOLRESULTS_INITIALIZE_SETTINGS_API_V3
       private_constant :FIREBASE_TEST_LAB_ENDPOINT
@@ -27,14 +27,14 @@ module Fastlane
       end
 
       def self.init_default_bucket(gcp_project)
-        conn = Faraday.new(TOOLRESULTS_API_ENDPOINT)
+        conn = Faraday.new(APIARY_ENDPOINT)
         conn.post(TOOLRESULTS_INITIALIZE_SETTINGS_API_V3.gsub("{project}", gcp_project)) do |req|
           req.headers = @auth.apply(req.headers)
         end
       end
 
       def self.get_default_bucket(gcp_project)
-        conn = Faraday.new(TOOLRESULTS_API_ENDPOINT)
+        conn = Faraday.new(APIARY_ENDPOINT)
         resp = conn.get(TOOLRESULTS_GET_SETTINGS_API_V3.gsub("{project}", gcp_project)) do |req|
           req.headers = @auth.apply(req.headers)
         end
