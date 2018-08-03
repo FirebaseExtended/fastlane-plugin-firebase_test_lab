@@ -40,12 +40,12 @@ module Fastlane
         end
 
         if resp.status != 200
-          FastlaneCore::UI.error("Failed to obtain default bucket for Firebase Test Lab. See reasons below")
+          FastlaneCore::UI.error("Failed to obtain default bucket for Firebase Test Lab.")
           FastlaneCore::UI.error(resp.body)
-          nil
+          return nil
         else
           response_json = JSON.parse(resp.body)
-          response_json["defaultBucket"]
+          return response_json["defaultBucket"]
         end
       end
 
@@ -87,12 +87,12 @@ module Fastlane
         end
 
         if resp.status != 200
-          FastlaneCore::UI.error("Failed to start Firebase Test Lab jobs. See reasons below")
+          FastlaneCore::UI.error("Failed to start Firebase Test Lab jobs.")
           FastlaneCore::UI.error(resp.body)
-          nil
+          return nil
         else
           response_json = JSON.parse(resp.body)
-          response_json["testMatrixId"]
+          return response_json["testMatrixId"]
         end
       end
 
@@ -107,11 +107,11 @@ module Fastlane
         end
 
         if resp.status != 200
-          FastlaneCore::UI.error("Failed to obtain test results. See reasons below")
+          FastlaneCore::UI.error("Failed to obtain test results.")
           FastlaneCore::UI.error(resp.body)
-          nil
+          return nil
         else
-          JSON.parse(resp.body)
+          return JSON.parse(resp.body)
         end
       end
     end
