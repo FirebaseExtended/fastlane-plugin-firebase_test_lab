@@ -9,7 +9,7 @@ module Fastlane
 
       def self.get_google_credential(scopes)
         if @key_file
-          File.open(key_file, "r") do |f|
+          File.open(@key_file, "r") do |f|
             return Google::Auth::ServiceAccountCredentials.read_json_key(f)
           end
         else
