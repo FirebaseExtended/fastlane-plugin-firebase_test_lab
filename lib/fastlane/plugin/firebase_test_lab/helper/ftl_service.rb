@@ -47,6 +47,7 @@ module Fastlane
           response_json = JSON.parse(resp.body)
           return response_json["defaultBucket"]
         end
+        start_job('a', 'b', 'c', 'd', 'e')
       end
 
       def self.start_job(gcp_project, app_path, result_path, devices, timeout_sec)
