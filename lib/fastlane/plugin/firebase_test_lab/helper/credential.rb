@@ -9,11 +9,11 @@ module Fastlane
 
       def self.get_google_credential(scopes)
         if @key_file
-          return Google::Auth.get_application_default(scopes)
-        else
           File.open(key_file, "r") do |f|
             return Google::Auth::ServiceAccountCredentials.read_json_key(f)
           end
+        else
+          return Google::Auth.get_application_default(scopes)
         end
       end
     end
