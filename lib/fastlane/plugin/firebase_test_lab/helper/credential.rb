@@ -3,7 +3,7 @@ require 'googleauth'
 module Fastlane
   module FirebaseTestLab
     class Credential
-      def initialize(key_file_path)
+      def initialize(key_file_path = nil)
         @key_file_path = key_file_path
       end
 
