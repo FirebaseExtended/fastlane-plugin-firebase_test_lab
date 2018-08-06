@@ -12,7 +12,7 @@ module Fastlane
       FTL_CREATE_API = "/v1/projects/{project}/testMatrices"
       FTL_RESULTS_API = "/v1/projects/{project}/testMatrices/{matrix}"
 
-      SCOPES = ["https://www.googleapis.com/auth/cloud-platform"]
+      TESTLAB_OAUTH_SCOPES = ["https://www.googleapis.com/auth/cloud-platform"]
 
       private_constant :APIARY_ENDPOINT
       private_constant :TOOLRESULTS_GET_SETTINGS_API_V3
@@ -23,7 +23,7 @@ module Fastlane
       private_constant :GCS_OAUTH_SCOPES
 
       def initialize(credential)
-        @auth = credential.get_google_credential(SCOPES)
+        @auth = credential.get_google_credential(TESTLAB_OAUTH_SCOPES)
       end
 
       def self.init_default_bucket(gcp_project)
@@ -47,7 +47,6 @@ module Fastlane
           response_json = JSON.parse(resp.body)
           return response_json["defaultBucket"]
         end
-        start_job('a', 'b', 'c', 'd', 'e')
       end
 
       def self.start_job(gcp_project, app_path, result_path, devices, timeout_sec)
