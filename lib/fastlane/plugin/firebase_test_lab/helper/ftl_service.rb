@@ -20,7 +20,7 @@ module Fastlane
       private_constant :FIREBASE_TEST_LAB_ENDPOINT
       private_constant :FTL_CREATE_API
       private_constant :FTL_RESULTS_API
-      private_constant :SCOPES
+      private_constant :GCS_OAUTH_SCOPES
 
       def initialize(credential)
         @auth = credential.get_google_credential(SCOPES)
@@ -72,9 +72,6 @@ module Fastlane
           resultStorage: {
             googleCloudStorage: {
               gcsPath: result_path
-            },
-            toolResultsHistory: {
-              projectId: gcp_project
             }
           }
         }
