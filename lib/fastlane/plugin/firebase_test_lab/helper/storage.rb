@@ -14,7 +14,7 @@ module Fastlane
                                              credentials: credentials)
       end
 
-      def self.upload_file(file_name, target_bucket, target_path)
+      def upload_file(file_name, target_bucket, target_path)
         bucket = @client.bucket(target_bucket)
         bucket.create_file(file_name, target_path)
       end

@@ -20,20 +20,24 @@ module Fastlane
       private_constant :FIREBASE_TEST_LAB_ENDPOINT
       private_constant :FTL_CREATE_API
       private_constant :FTL_RESULTS_API
-      private_constant :GCS_OAUTH_SCOPES
+      private_constant :TESTLAB_OAUTH_SCOPES
 
       def initialize(credential)
         @auth = credential.get_google_credential(TESTLAB_OAUTH_SCOPES)
+        @default_bucket = nil
       end
 
-      def self.init_default_bucket(gcp_project)
+      def init_default_bucket(gcp_project)
         conn = Faraday.new(APIARY_ENDPOINT)
         conn.post(TOOLRESULTS_INITIALIZE_SETTINGS_API_V3.gsub("{project}", gcp_project)) do |req|
           req.headers = @auth.apply(req.headers)
         end
       end
 
-      def self.get_default_bucket(gcp_project)
+      def get_default_bucket(gcp_project)
+        return @default_bucket unless @default_bucket.nil?
+
+        init_default_bucket(gcp_project)
         conn = Faraday.new(APIARY_ENDPOINT)
         resp = conn.get(TOOLRESULTS_GET_SETTINGS_API_V3.gsub("{project}", gcp_project)) do |req|
           req.headers = @auth.apply(req.headers)
@@ -45,11 +49,12 @@ module Fastlane
           return nil
         else
           response_json = JSON.parse(resp.body)
-          return response_json["defaultBucket"]
+          @default_bucket = response_json["defaultBucket"]
+          return @default_bucket
         end
       end
 
-      def self.start_job(gcp_project, app_path, result_path, devices, timeout_sec)
+      def start_job(gcp_project, app_path, result_path, devices, timeout_sec)
         body = {
           projectId: gcp_project,
           testSpecification: {
@@ -93,7 +98,7 @@ module Fastlane
         end
       end
 
-      def self.get_matrix_results(gcp_project, matrix_id)
+      def get_matrix_results(gcp_project, matrix_id)
         url = FTL_RESULTS_API
                 .gsub("{project}", gcp_project)
                 .gsub("{matrix}", matrix_id)
