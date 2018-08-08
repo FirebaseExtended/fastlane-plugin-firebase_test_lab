@@ -5,14 +5,15 @@ require_relative '../options'
 
 require 'json'
 require 'securerandom'
+require 'tty-spinner'
 
 module Fastlane
   module Actions
     class FirebaseTestLabIosXctestAction < Action
-      FILE_NAME = "bundle"
+      DEFAULT_APP_BUNDLE_NAME = "bundle"
       PULL_RESULT_INTERVAL = 5
 
-      private_constant :FILE_NAME
+      private_constant :DEFAULT_APP_BUNDLE_NAME
       private_constant :PULL_RESULT_INTERVAL
 
       def self.run(params)
@@ -21,46 +22,57 @@ module Fastlane
         gcp_credential = Fastlane::FirebaseTestLab::Credential.new(key_file_path: oauth_key_file)
 
         ftl_service = Fastlane::FirebaseTestLab::FirebaseTestLabService.new(gcp_credential)
-        artifact_directory = generate_directory_name + "/"
+        gcs_workfolder = generate_directory_name
 
         if params[:app_path].to_s.start_with?("gs://")
-          gcs_file_name = params[:app_path]
+          app_gcs_link = params[:app_path]
         else
+          upload_spinner = TTY::Spinner.new("[:spinner] Uploading the app to GCS", format: :dots)
+          upload_spinner.auto_spin
           upload_bucket_name = ftl_service.get_default_bucket(gcp_project)
-          gcs_file_name = upload_file(params[:app_path], upload_bucket_name, artifact_directory, gcp_project, gcp_credential)
+          app_gcs_link = upload_file(params[:app_path],
+                                     upload_bucket_name,
+                                     "#{gcs_workfolder}/#{DEFAULT_APP_BUNDLE_NAME}",
+                                     gcp_project,
+                                     gcp_credential)
+          # upload_spinner.stop("Upload completed!")
+          upload_spinner.success
         end
 
         UI.message("Submitting job(s) to Firebase Test Lab")
-        result_bucket_name = ftl_service.get_default_bucket(gcp_project)
-        result_storage = (params[:result_storage] or "gs://#{result_bucket_name}/#{artifact_directory}")
-        matrix_id = ftl_service.start_job(gcp_project, gcs_file_name, result_storage, params[:devices],
+        result_storage = (params[:result_storage] or
+          "gs://#{ftl_service.get_default_bucket(gcp_project)}/#{gcs_workfolder}")
+        matrix_id = ftl_service.start_job(gcp_project,
+                                          app_gcs_link,
+                                          result_storage,
+                                          params[:devices],
                                           params[:timeout_sec])
         if matrix_id.nil?
-          UI.error!("No matrix ID received.")
+          UI.abort_with_message!("No matrix ID received.")
         end
         UI.message("Matrix ID for this submission: #{matrix_id}")
         if params[:async]
-          UI.success("Jobs are submitted to Firebase Test Lab")
+          UI.success("Jobs have been submitted to Firebase Test Lab")
         end
 
-        UI.message("Waiting for test results...")
         return wait_for_test_results(ftl_service, gcp_project, matrix_id)
       end
 
-      def self.upload_file(app_path, bucket_name, artifact_directory, gcp_project, gcp_credential)
-        file_name = "gs://#{bucket_name}/#{artifact_directory}" + FILE_NAME
-        UI.message("Uploading " + app_path + " to #{file_name}")
+      def self.upload_file(app_path, bucket_name, gcs_path, gcp_project, gcp_credential)
+        file_name = "gs://#{bucket_name}/#{gcs_path}"
         storage = Fastlane::FirebaseTestLab::Storage.new(gcp_project, gcp_credential)
-        storage.upload_file(app_path, bucket_name, artifact_directory + FILE_NAME)
-        UI.message("Upload completed")
+        storage.upload_file(app_path, bucket_name, gcs_path)
         return file_name
       end
 
       def self.wait_for_test_results(ftl_service, gcp_project, matrix_id)
+        spinner = TTY::Spinner.new("[:spinner] Waiting for test results...", format: :dots)
+        spinner.auto_spin
         while true
           results = ftl_service.get_matrix_results(gcp_project, matrix_id)
           case results["state"]
           when "FINISHED"
+            spinner.stop("Done")
             UI.message("Test jobs are completed")
             UI.message("-------------------------")
             UI.message("|        RESULTS        |")
@@ -76,7 +88,7 @@ module Fastlane
               UI.test_failure!("Some tests on Firebase Test Lab have failed")
               return false
             else
-              UI.success("All jobs finished successfully")
+              UI.success("🎉All jobs finished successfully")
               return true
             end
           when "ERROR"
@@ -105,7 +117,8 @@ module Fastlane
       end
 
       def self.generate_directory_name
-        SecureRandom.hex
+        ts_str = Time.now.getutc.strftime "%Y%m%d-%H%M%SZ"
+        return "fastlane-#{ts_str}-#{SecureRandom.hex[0..5]}"
       end
 
       #####################################################
