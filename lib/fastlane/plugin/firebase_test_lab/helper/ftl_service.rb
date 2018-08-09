@@ -28,7 +28,10 @@ module Fastlane
       end
 
       def init_default_bucket(gcp_project)
-        conn = Faraday.new(APIARY_ENDPOINT)
+        conn = Faraday.new(APIARY_ENDPOINT) do |builder|
+          builder.options[:open_timeout] = 5
+          builder.options[:timeout] = 30
+        end
         conn.post(TOOLRESULTS_INITIALIZE_SETTINGS_API_V3.gsub("{project}", gcp_project)) do |req|
           req.headers = @auth.apply(req.headers)
         end
@@ -38,7 +41,10 @@ module Fastlane
         return @default_bucket unless @default_bucket.nil?
 
         init_default_bucket(gcp_project)
-        conn = Faraday.new(APIARY_ENDPOINT)
+        conn = Faraday.new(APIARY_ENDPOINT) do |builder|
+          builder.options[:open_timeout] = 5
+          builder.options[:timeout] = 30
+        end
         resp = conn.get(TOOLRESULTS_GET_SETTINGS_API_V3.gsub("{project}", gcp_project)) do |req|
           req.headers = @auth.apply(req.headers)
         end
@@ -80,7 +86,10 @@ module Fastlane
           }
         }
 
-        conn = Faraday.new(FIREBASE_TEST_LAB_ENDPOINT)
+        conn = Faraday.new(FIREBASE_TEST_LAB_ENDPOINT) do |builder|
+          builder.options[:open_timeout] = 5
+          builder.options[:timeout] = 30
+        end
         resp = conn.post(FTL_CREATE_API.gsub("{project}", gcp_project)) do |req|
           req.headers = @auth.apply(req.headers)
           req.headers["Content-Type"] = "application/json"
@@ -103,7 +112,10 @@ module Fastlane
                 .gsub("{project}", gcp_project)
                 .gsub("{matrix}", matrix_id)
 
-        conn = Faraday.new(FIREBASE_TEST_LAB_ENDPOINT)
+        conn = Faraday.new(FIREBASE_TEST_LAB_ENDPOINT) do |builder|
+          builder.options[:open_timeout] = 5
+          builder.options[:timeout] = 30
+        end
         resp = conn.get(url) do |req|
           req.headers = @auth.apply(req.headers)
         end

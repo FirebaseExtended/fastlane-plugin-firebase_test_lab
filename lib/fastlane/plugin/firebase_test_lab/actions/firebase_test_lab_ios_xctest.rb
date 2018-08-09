@@ -32,15 +32,17 @@ module Fastlane
 
       def self.run(params)
         gcp_project = params[:gcp_project]
-        oauth_key_file = params[:oauth_key_file]
-        gcp_credential = Fastlane::FirebaseTestLab::Credential.new(key_file_path: oauth_key_file)
+        oauth_key_file_path = params[:oauth_key_file_path]
+        gcp_credential = Fastlane::FirebaseTestLab::Credential.new(key_file_path: oauth_key_file_path)
 
         ftl_service = Fastlane::FirebaseTestLab::FirebaseTestLabService.new(gcp_credential)
         gcs_workfolder = generate_directory_name
 
         if params[:app_path].to_s.start_with?("gs://")
+          # When given a GCS link, we do not attempt to re-upload the app to a different bucket
           app_gcs_link = params[:app_path]
         else
+          # When given a local path, we upload it to GCS
           upload_spinner = TTY::Spinner.new("[:spinner] Uploading the app to GCS...", format: :dots)
           upload_spinner.auto_spin
           upload_bucket_name = ftl_service.get_default_bucket(gcp_project)
@@ -65,7 +67,7 @@ module Fastlane
         end
         UI.message("Matrix ID for this submission: #{matrix_id}")
         if params[:async]
-          UI.success("Jobs have been submitted to Firebase Test Lab")
+          UI.success("Job(s) have been submitted to Firebase Test Lab")
           return true
         end
 
@@ -110,7 +112,7 @@ module Fastlane
 
           if state == "FINISHED"
             spinner.success("Done")
-            UI.message("Test jobs are completed")
+            UI.message("Test job(s) are completed")
             UI.message("-------------------------")
             UI.message("|        RESULTS        |")
             UI.message("-------------------------")
@@ -128,14 +130,16 @@ module Fastlane
               UI.test_failure!("Some tests on Firebase Test Lab have failed")
               return false
             else
-              UI.success("🎉All jobs finished successfully")
+              UI.success("🎉All job(s) finished successfully")
               return true
             end
           end
 
           unless RUNNING_STATES.include?(state)
             spinner.error("Failed")
-            UI.user_error!("The execution is in an unknown state: #{state}")
+            UI.abort_with_message!("The test execution is in an unknown state: #{state}. " \
+              "We appreciate if you could notify us at " \
+              "https://github.com/fastlane/fastlane-plugin-firebase_test_lab/issues")
           end
           sleep(PULL_RESULT_INTERVAL)
         end
