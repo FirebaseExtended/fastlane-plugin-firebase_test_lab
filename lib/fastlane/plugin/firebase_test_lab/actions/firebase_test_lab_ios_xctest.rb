@@ -13,7 +13,8 @@ module Fastlane
       DEFAULT_APP_BUNDLE_NAME = "bundle"
       PULL_RESULT_INTERVAL = 5
 
-      ERROR_CODE_TO_MESSAGE = {
+      RUNNING_STATES = %w(VALIDATING PENDING RUNNING)
+      ERROR_STATE_TO_MESSAGE = {
         ERROR: "The execution or matrix has stopped because it encountered an infrastructure failure.",
         UNSUPPORTED_ENVIRONMENT: "The execution was not run because it corresponds to a unsupported environment.",
         INCOMPATIBLE_ENVIRONMENT: "The execution was not run because the provided inputs are incompatible with the " \
@@ -26,7 +27,8 @@ module Fastlane
 
       private_constant :DEFAULT_APP_BUNDLE_NAME
       private_constant :PULL_RESULT_INTERVAL
-      private_constant :ERROR_CODE_TO_MESSAGE
+      private_constant :RUNNING_STATES
+      private_constant :ERROR_STATE_TO_MESSAGE
 
       def self.run(params)
         gcp_project = params[:gcp_project]
@@ -64,6 +66,7 @@ module Fastlane
         UI.message("Matrix ID for this submission: #{matrix_id}")
         if params[:async]
           UI.success("Jobs have been submitted to Firebase Test Lab")
+          return true
         end
 
         return wait_for_test_results(ftl_service, gcp_project, matrix_id)
@@ -99,9 +102,9 @@ module Fastlane
           end
 
           state = results["state"]
-          if ERROR_CODE_TO_MESSAGE.key?(state)
+          if ERROR_STATE_TO_MESSAGE.key?(state)
             spinner.error("Failed")
-            UI.user_error!(ERROR_CODE_TO_MESSAGE[state])
+            UI.user_error!(ERROR_STATE_TO_MESSAGE[state])
             return false
           end
 
@@ -130,6 +133,10 @@ module Fastlane
             end
           end
 
+          unless RUNNING_STATES.include?(state)
+            spinner.error("Failed")
+            UI.user_error!("The execution is in an unknown state: #{state}")
+          end
           sleep(PULL_RESULT_INTERVAL)
         end
       end
