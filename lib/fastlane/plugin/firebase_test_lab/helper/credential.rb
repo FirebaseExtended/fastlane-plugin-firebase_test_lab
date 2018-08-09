@@ -7,7 +7,7 @@ module Fastlane
         @key_file_path = key_file_path
       end
 
-      def self.get_google_credential(scopes)
+      def get_google_credential(scopes)
         return Google::Auth.get_application_default(scopes) unless @key_file_path
 
         File.open(@key_file_path, "r") do |file|
