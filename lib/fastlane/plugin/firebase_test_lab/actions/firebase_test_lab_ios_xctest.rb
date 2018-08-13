@@ -91,11 +91,11 @@ module Fastlane
           results = ftl_service.get_matrix_results(gcp_project, matrix_id)
 
           if firebase_console_link.nil?
-            firebase_console_link = try_get_firebase_console_link(results)
+            firebase_console_link = try_get_firebase_console_link(results, gcp_project)
             # Once we get the Firebase console link, we display that once
             unless firebase_console_link.nil?
               spinner.success("Done")
-              UI.message("Click #{firebase_console_link} for more information about this run")
+              UI.message("Go to #{firebase_console_link} for more information about this run")
               spinner = TTY::Spinner.new("[:spinner] Waiting for results...", format: :dots)
               spinner.auto_spin
             end
@@ -128,7 +128,7 @@ module Fastlane
         return "fastlane-#{timestamp}-#{SecureRandom.hex[0..5]}"
       end
 
-      def self.try_get_firebase_console_link(results)
+      def self.try_get_firebase_console_link(results, gcp_project)
         if results["resultStorage"].nil? || results["resultStorage"]["toolResultsExecution"].nil?
           return nil
         end
