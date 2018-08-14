@@ -36,13 +36,16 @@ module Fastlane
         gcp_credential = Fastlane::FirebaseTestLab::Credential.new(key_file_path: oauth_key_file_path)
 
         ftl_service = Fastlane::FirebaseTestLab::FirebaseTestLabService.new(gcp_credential)
+
+        # The default Google Cloud Storage path we store app bundle and test results
         gcs_workfolder = generate_directory_name
 
+        # Firebase Test Lab requires an app bundle be already on Google Cloud Storage before starting the job
         if params[:app_path].to_s.start_with?("gs://")
-          # When given a GCS link, we do not attempt to re-upload the app to a different bucket
+          # gs:// is a path on Google Cloud Storage, we do not need to re-upload the app to a different bucket
           app_gcs_link = params[:app_path]
         else
-          # When given a local path, we upload it to GCS
+          # When given a local path, we upload the app bundle to Google Cloud Storage
           upload_spinner = TTY::Spinner.new("[:spinner] Uploading the app to GCS...", format: :dots)
           upload_spinner.auto_spin
           upload_bucket_name = ftl_service.get_default_bucket(gcp_project)
@@ -57,11 +60,15 @@ module Fastlane
         UI.message("Submitting job(s) to Firebase Test Lab")
         result_storage = (params[:result_storage] or
           "gs://#{ftl_service.get_default_bucket(gcp_project)}/#{gcs_workfolder}")
+
+        # We have gathered all the information. Call Firebase Test Lab to start the job now
         matrix_id = ftl_service.start_job(gcp_project,
                                           app_gcs_link,
                                           result_storage,
                                           params[:devices],
                                           params[:timeout_sec])
+
+        # In theory, matrix_id should be available. Keep it to catch unexpected Firebase Test Lab API response
         if matrix_id.nil?
           UI.abort_with_message!("No matrix ID received.")
         end
@@ -87,6 +94,7 @@ module Fastlane
         spinner = TTY::Spinner.new("[:spinner] Starting tests...", format: :dots)
         spinner.auto_spin
 
+        # Keep pulling test results until they are ready
         while true
           results = ftl_service.get_matrix_results(gcp_project, matrix_id)
 
@@ -102,6 +110,7 @@ module Fastlane
           end
 
           state = results["state"]
+          # Handle all known error statuses
           if ERROR_STATE_TO_MESSAGE.key?(state)
             spinner.error("Failed")
             UI.user_error!(ERROR_STATE_TO_MESSAGE[state])
@@ -113,6 +122,8 @@ module Fastlane
             return handle_job_finished(results)
           end
 
+          # We should have caught all known states here. If the state is not one of them, this
+          # plugin should be modified to handle that
           unless RUNNING_STATES.include?(state)
             spinner.error("Failed")
             UI.abort_with_message!("The test execution is in an unknown state: #{state}. " \

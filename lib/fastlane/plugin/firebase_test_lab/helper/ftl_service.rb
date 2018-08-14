@@ -29,10 +29,15 @@ module Fastlane
 
       def init_default_bucket(gcp_project)
         conn = Faraday.new(APIARY_ENDPOINT)
-        conn.post(TOOLRESULTS_INITIALIZE_SETTINGS_API_V3.gsub("{project}", gcp_project)) do |req|
-          req.headers = @auth.apply(req.headers)
-          req.options.timeout = 15
-          req.options.open_timeout = 5
+        begin
+          conn.post(TOOLRESULTS_INITIALIZE_SETTINGS_API_V3.gsub("{project}", gcp_project)) do |req|
+            req.headers = @auth.apply(req.headers)
+            req.options.timeout = 15
+            req.options.open_timeout = 5
+          end
+        rescue Faraday::Error => ex
+          UI.abort_with_message!("Network error when initializing Firebase Test Lab, " \
+            "type: #{ex.class}, message: #{ex.message}")
         end
       end
 
@@ -41,10 +46,15 @@ module Fastlane
 
         init_default_bucket(gcp_project)
         conn = Faraday.new(APIARY_ENDPOINT)
-        resp = conn.get(TOOLRESULTS_GET_SETTINGS_API_V3.gsub("{project}", gcp_project)) do |req|
-          req.headers = @auth.apply(req.headers)
-          req.options.timeout = 15
-          req.options.open_timeout = 5
+        begin
+          resp = conn.get(TOOLRESULTS_GET_SETTINGS_API_V3.gsub("{project}", gcp_project)) do |req|
+            req.headers = @auth.apply(req.headers)
+            req.options.timeout = 15
+            req.options.open_timeout = 5
+          end
+        rescue Faraday::Error => ex
+          UI.abort_with_message!("Network error when obtaining Firebase Test Lab default GCS bucket, " \
+            "type: #{ex.class}, message: #{ex.message}")
         end
 
         if resp.status != 200
@@ -85,13 +95,18 @@ module Fastlane
         }
 
         conn = Faraday.new(FIREBASE_TEST_LAB_ENDPOINT)
-        resp = conn.post(FTL_CREATE_API.gsub("{project}", gcp_project)) do |req|
-          req.headers = @auth.apply(req.headers)
-          req.headers["Content-Type"] = "application/json"
-          req.headers["X-Goog-User-Project"] = gcp_project
-          req.body = body.to_json
-          req.options.timeout = 15
-          req.options.open_timeout = 5
+        begin
+          resp = conn.post(FTL_CREATE_API.gsub("{project}", gcp_project)) do |req|
+            req.headers = @auth.apply(req.headers)
+            req.headers["Content-Type"] = "application/json"
+            req.headers["X-Goog-User-Project"] = gcp_project
+            req.body = body.to_json
+            req.options.timeout = 15
+            req.options.open_timeout = 5
+          end
+        rescue Faraday::Error => ex
+          UI.abort_with_message!("Network error when initializing Firebase Test Lab, " \
+            "type: #{ex.class}, message: #{ex.message}")
         end
 
         if resp.status != 200
@@ -110,10 +125,15 @@ module Fastlane
                 .gsub("{matrix}", matrix_id)
 
         conn = Faraday.new(FIREBASE_TEST_LAB_ENDPOINT)
-        resp = conn.get(url) do |req|
-          req.headers = @auth.apply(req.headers)
-          req.options.timeout = 15
-          req.options.open_timeout = 5
+        begin
+          resp = conn.get(url) do |req|
+            req.headers = @auth.apply(req.headers)
+            req.options.timeout = 15
+            req.options.open_timeout = 5
+          end
+        rescue Faraday::Error => ex
+          UI.abort_with_message!("Network error when attempting to get test results, " \
+            "type: #{ex.class}, message: #{ex.message}")
         end
 
         if resp.status != 200
