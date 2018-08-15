@@ -48,7 +48,7 @@ module Fastlane
                                          UI.user_error!("Invalid GCS path: '#{value}'") \
                                            unless value.to_s.start_with?("gs://")
                                        end),
-          FastlaneCore::ConfigItem.new(key: :oauth_key_file,
+          FastlaneCore::ConfigItem.new(key: :oauth_key_file_path,
                                        description: "Use the given Google cloud service key file." +\
                                                     "If not set, application default credential will be used " +\
                                                     "(see https://cloud.google.com/docs/authentication/production)",

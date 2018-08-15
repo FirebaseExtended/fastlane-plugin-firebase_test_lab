@@ -20,6 +20,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'faraday'
   spec.add_dependency 'googleauth'
   spec.add_dependency 'google-cloud-storage', '~> 1.13.0'
+  spec.add_dependency 'tty-spinner', '>= 0.8.0', '< 1.0.0'
 
   spec.add_development_dependency 'bundler'
   spec.add_development_dependency 'fastlane', '>= 2.101.0'
