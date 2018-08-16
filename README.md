@@ -22,9 +22,9 @@ You need to set up Firebase first. These only needs to be done once for an organ
 Since iOS support on Firebase Test Lab is in beta, only Firebase [Flame and Blaze Plan](https://firebase.google.com/pricing/) are currently supported by this plugin. If you are on Spark plan, you can still use [Firebase Console](https://firebase.google.com/firebase-console) to test your iOS apps.
 
 ### Configure Google credentials through service accounts
-To authenticate, Google Cloud credential will need to be set for any machine where fastlane and this plugin runs on.
+To authenticate, Google Cloud credentials will need to be set for any machine where fastlane and this plugin runs on.
 
-If you are running this plugin on Google Cloud [Compute Engine](https://cloud.google.com/compute), [Kubernetes Engine](https://cloud.google.com/kubernetes-engine) or [App Engine flexible environment](https://cloud.google.com/appengine/docs/flexible/), a default service account is automatically. See [this](https://cloud.google.com/compute/docs/access/service-accounts#compute_engine_default_service_account) for more details.
+If you are running this plugin on Google Cloud [Compute Engine](https://cloud.google.com/compute), [Kubernetes Engine](https://cloud.google.com/kubernetes-engine) or [App Engine flexible environment](https://cloud.google.com/appengine/docs/flexible/), a default service account is automatically provisioned. You will not need to create a service account. See [this](https://cloud.google.com/compute/docs/access/service-accounts#compute_engine_default_service_account) for more details.
 
 In all other cases, you would need to configure the service account manually. You can follow [this guide](https://cloud.google.com/docs/authentication/getting-started) on how to create a new service account. You will need to set the `GOOGLE_APPLICATION_CREDENTIALS` environment variable according to the document.
 
@@ -42,7 +42,7 @@ If you have [gcloud tool](https://cloud.google.com/sdk/gcloud/), you can run
 ```bash
 gcloud beta firebase test ios models list
 ```
-This will return a list of supported devices.
+This will return a list of supported devices and their identifiers.
 
 All available devices can also be seen [here](https://firebase.google.com/docs/test-lab/ios/available-testing-devices). 
 
@@ -54,7 +54,7 @@ All available devices can also be seen [here](https://firebase.google.com/docs/t
 Submit your iOS app to Firebase Test Lab and run XCTest
 ```ruby
 scan(
-  project: 'YourApp.xcodeproj',       # Path to the XCode project file
+  project: 'YourApp.xcodeproj',       # Path to the Xcode project file
   scheme: 'YourApp',                  # XCTest scheme
   should_zip_build_products: true     # Must be true to set the correct format for Firebase Test Lab
 )
@@ -72,6 +72,7 @@ firebase_test_lab_ios_xctest(
 ```
 
 Arguments available are:
+
 - `app_path` You may provide a different path in the local filesystem (e.g: `/path/to/app-bundle.zip`) or on Google Cloud Storage (`gs://your-bucket/path/to/app-bundle.zip`) that points to an app bundle as specified [here](https://firebase.google.com/docs/test-lab/ios/command-line#build_xctests_for_your_app). If a Google Cloud Storage path is used, the service account must have read access to such file.
 - `gcp_project` The Google Cloud project name for Firebase Test Lab to run on.
 - `oauth_key_file_path` The path to the Google Cloud service account key. If not set, the default credential will be used.
@@ -81,7 +82,7 @@ Arguments available are:
 
 ## Issues and Feedback
 
-For any other issues and feedback about this plugin, please submit it to this repository.
+If you have any other issues and feedback about this plugin, we appreciate if you could submit an issue to this repository.
 
 ## Troubleshooting
 
