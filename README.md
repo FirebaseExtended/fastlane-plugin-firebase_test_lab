@@ -56,6 +56,7 @@ Submit your iOS app to Firebase Test Lab and run XCTest
 scan(
   project: 'YourApp.xcodeproj',       # Path to the Xcode project file
   scheme: 'YourApp',                  # XCTest scheme
+  sdk: 'iphoneos',                    # Required
   should_zip_build_products: true     # Must be true to set the correct format for Firebase Test Lab
 )
 firebase_test_lab_ios_xctest(
