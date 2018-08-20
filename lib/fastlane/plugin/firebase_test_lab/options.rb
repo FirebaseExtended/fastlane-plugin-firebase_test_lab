@@ -23,8 +23,8 @@ module Fastlane
                                          value.each do |current|
                                            UI.user_error!("Each device must be represented by a Hash object, " +
                                              "#{current.class} found") if current.class != Hash
-                                           check_has_property(current, :iosModelId)
-                                           check_has_property(current, :iosVersionId)
+                                           check_has_property(current, :ios_model_id)
+                                           check_has_property(current, :ios_version_id)
                                            set_default_property(current, :locale, "en_US")
                                            set_default_property(current, :orientation, "portrait")
                                          end
