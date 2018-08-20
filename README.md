@@ -63,8 +63,8 @@ firebase_test_lab_ios_xctest(
   gcp_project: 'your-google-project', # Your Google Cloud project name
   devices: [                          # Device(s) to run tests on
     {
-      iosModelId: 'iphonex',          # Device model ID, use gcloud command above
-      iosVersionId: '11.2',           # iOS version ID, use gcloud command above
+      ios_model_id: 'iphonex',          # Device model ID, use gcloud command above
+      ios_version_id: '11.2',           # iOS version ID, use gcloud command above
       locale: 'en_US',                # Optional: default to en_US if not set
       orientation: 'portrait'         # Optional: default to portrait if not set
     }
