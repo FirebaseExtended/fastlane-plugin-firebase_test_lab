@@ -84,7 +84,7 @@ module Fastlane
           },
           environmentMatrix: {
             iosDeviceList: {
-              iosDevices: devices
+              iosDevices: devices.map(self.mapDeviceToProto)
             }
           },
           resultStorage: {
@@ -143,6 +143,15 @@ module Fastlane
         else
           return JSON.parse(resp.body)
         end
+      end
+
+      def self.mapDeviceToProto(device)
+        {
+          iosModelId: device[:ios_model_id],
+          iosVersionId: device[:ios_version_id],
+          locale: device[:locale],
+          orientation: device[:orientation],
+        }
       end
     end
   end
