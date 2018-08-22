@@ -16,17 +16,17 @@ fastlane add_plugin firebase_test_lab
 You need to set up Firebase first. These only needs to be done once for an organization.
 
 - If you have not used Google Cloud before, you need to [create a new Google Cloud project](https://cloud.google.com/resource-manager/docs/creating-managing-projects#Creating%20a%20Project) first.
-- Go to the [Firebase Console](https://console.firebase.google.com/), to add Firebase into your Google Cloud project.
+- Go to the [Firebase Console](https://console.firebase.google.com/). Add Firebase into your Google Cloud project by clicking on "Add project" and then choose your just-created project..
 
-### Limitation on using this plugin during Firebase Test Lab iOS beta
-Since iOS support on Firebase Test Lab is in beta, only Firebase [Flame and Blaze Plan](https://firebase.google.com/pricing/) are currently supported by this plugin. If you are on Spark plan, you can still use [Firebase Console](https://firebase.google.com/firebase-console) to test your iOS apps.
+### Firebase Test Lab iOS beta signup
+During the beta test, your Google Cloud Project must be enrolled in beta in order to run tests on iOS devices. You may click [this link](https://docs.google.com/forms/d/e/1FAIpQLSf5cx1ot8ndHU9YrFkCn6gPoQZLxgW_6H13e_bot3he90n7Ng/viewform) to sign up.
 
 ### Configure Google credentials through service accounts
 To authenticate, Google Cloud credentials will need to be set for any machine where fastlane and this plugin runs on.
 
 If you are running this plugin on Google Cloud [Compute Engine](https://cloud.google.com/compute), [Kubernetes Engine](https://cloud.google.com/kubernetes-engine) or [App Engine flexible environment](https://cloud.google.com/appengine/docs/flexible/), a default service account is automatically provisioned. You will not need to create a service account. See [this](https://cloud.google.com/compute/docs/access/service-accounts#compute_engine_default_service_account) for more details.
 
-In all other cases, you would need to configure the service account manually. You can follow [this guide](https://cloud.google.com/docs/authentication/getting-started) on how to create a new service account. You will need to set the `GOOGLE_APPLICATION_CREDENTIALS` environment variable according to the document.
+In all other cases, you would need to configure the service account manually. You can follow [this guide](https://cloud.google.com/docs/authentication/getting-started) on how to create a new service account and create a key for it. You will need to set the `GOOGLE_APPLICATION_CREDENTIALS` environment variable pointing to the service account key file according to the document.
 
 No matter you are a using an automatically provisioned service account or a manually created one, the service account must be configured to have project editor role.
 
