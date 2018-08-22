@@ -11,7 +11,11 @@ module Fastlane
         return Google::Auth.get_application_default(scopes) unless @key_file_path
 
         File.open(@key_file_path, "r") do |file|
-          return Google::Auth::ServiceAccountCredentials.read_json_key(file)
+          options = {
+            json_key_io: file,
+            scope: scopes
+          }
+          return Google::Auth::ServiceAccountCredentials.make_creds(options)
         end
       end
     end
