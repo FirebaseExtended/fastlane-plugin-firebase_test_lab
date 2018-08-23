@@ -84,7 +84,7 @@ module Fastlane
           },
           environmentMatrix: {
             iosDeviceList: {
-              iosDevices: devices.map(self.map_device_to_proto)
+              iosDevices: devices.map(&FirebaseTestLabService.method(:map_device_to_proto))
             }
           },
           resultStorage: {
@@ -111,6 +111,10 @@ module Fastlane
 
         if resp.status != 200
           FastlaneCore::UI.error("Failed to start Firebase Test Lab jobs.")
+          FastlaneCore::UI.error("Hint: Have you enrolled in Firebase Test Lab iOS beta tester program? It is " \
+                                 "required during the beta testing. Click https://docs.google.com" \
+                                 "/forms/d/e/1FAIpQLSf5cx1ot8ndHU9YrFkCn6gPoQZLxgW_6H13e_bot3he90n7Ng/viewform " \
+                                 "to request access.")
           FastlaneCore::UI.error(resp.body)
           return nil
         else
