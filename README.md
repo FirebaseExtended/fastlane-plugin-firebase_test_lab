@@ -51,7 +51,7 @@ All available devices can also be seen [here](https://firebase.google.com/docs/t
 
 ### firebase_test_lab_ios_xctest
 
-Submit your iOS app to Firebase Test Lab and run XCTest
+Submit your iOS app to Firebase Test Lab and run XCTest. Refer to [this document](https://firebase.google.com/docs/test-lab/ios/command-line) for more details about Firebase Test Lab specific arguments.
 ```ruby
 scan(
   project: 'YourApp.xcodeproj',       # Path to the Xcode project file
