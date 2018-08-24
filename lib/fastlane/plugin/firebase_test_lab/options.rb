@@ -19,7 +19,16 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :devices,
                                        description: "Devices to test the app on",
                                        type: Array,
+                                       default_value: [{
+                                         ios_model_id: "iphonex",
+                                         ios_version_id: "11.2",
+                                         locale: "en_US",
+                                         orientation: "portrait"
+                                       }],
                                        verify_block: proc do |value|
+                                         if value.empty?
+                                           UI.user_error!("Devices cannot be empty")
+                                         end
                                          value.each do |current|
                                            UI.user_error!("Each device must be represented by a Hash object, " +
                                              "#{current.class} found") if current.class != Hash
