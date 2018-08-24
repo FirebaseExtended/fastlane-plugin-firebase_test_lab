@@ -63,8 +63,8 @@ firebase_test_lab_ios_xctest(
   gcp_project: 'your-google-project', # Your Google Cloud project name
   devices: [                          # Device(s) to run tests on
     {
-      ios_model_id: 'iphonex',          # Device model ID, use gcloud command above
-      ios_version_id: '11.2',           # iOS version ID, use gcloud command above
+      ios_model_id: 'iphonex',        # Device model ID, see gcloud command above
+      ios_version_id: '11.2',         # iOS version ID, see gcloud command above
       locale: 'en_US',                # Optional: default to en_US if not set
       orientation: 'portrait'         # Optional: default to portrait if not set
     }
@@ -77,6 +77,7 @@ Arguments available are:
 - `app_path` You may provide a different path in the local filesystem (e.g: `/path/to/app-bundle.zip`) or on Google Cloud Storage (`gs://your-bucket/path/to/app-bundle.zip`) that points to an app bundle as specified [here](https://firebase.google.com/docs/test-lab/ios/command-line#build_xctests_for_your_app). If a Google Cloud Storage path is used, the service account must have read access to such file.
 - `gcp_project` The Google Cloud project name for Firebase Test Lab to run on.
 - `oauth_key_file_path` The path to the Google Cloud service account key. If not set, the default credential will be used.
+- `devices` An array of devices for your app to be tested on. Each device is represented as a hash, with ios_model_id, ios_version_id, locale and orientation properties, the first two of which are required. If not set, it will be defaulted to iPhone X on iOS 11.2. This array cannot be empty.
 - `async` If set to true, the action will not wait for the test results but exit immediately.
 - `timeout_sec` After how long will the test be abandoned by Firebase Test Lab. Duration hould be given in seconds.
 - `result_storage` Designate which location on Google Cloud Storage to store the test results. This should be a directory (e.g: `gs://your-bucket/tests/`)
