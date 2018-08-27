@@ -16,7 +16,7 @@ module Fastlane
           end
         end
 
-        File.open(@key_file_path, "r") do |file|
+        File.open(File.expand_path(@key_file_path), "r") do |file|
           options = {
             json_key_io: file,
             scope: scopes

@@ -84,7 +84,7 @@ module Fastlane
       def self.upload_file(app_path, bucket_name, gcs_path, gcp_project, gcp_credential)
         file_name = "gs://#{bucket_name}/#{gcs_path}"
         storage = Fastlane::FirebaseTestLab::Storage.new(gcp_project, gcp_credential)
-        storage.upload_file(app_path, bucket_name, gcs_path)
+        storage.upload_file(File.expand_path(app_path), bucket_name, gcs_path)
         return file_name
       end
 
