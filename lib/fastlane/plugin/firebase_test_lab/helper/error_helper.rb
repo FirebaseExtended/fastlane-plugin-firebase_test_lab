@@ -6,7 +6,7 @@ module Fastlane
       def self.summarize_google_error(payload)
         begin
           response = JSON.parse(payload)
-        rescue JSON::ParserError => ex
+        rescue JSON::ParserError
           return payload
         end
 
