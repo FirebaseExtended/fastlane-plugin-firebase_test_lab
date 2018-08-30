@@ -1,7 +1,7 @@
 require 'googleauth'
 require 'json'
 
-require './error_helper'
+require_relative './error_helper'
 
 module Fastlane
   module FirebaseTestLab
