@@ -1,6 +1,8 @@
 require 'googleauth'
 require 'json'
 
+require_relative './error_helper'
+
 module Fastlane
   module FirebaseTestLab
     class FirebaseTestLabService
@@ -59,7 +61,7 @@ module Fastlane
 
         if resp.status != 200
           FastlaneCore::UI.error("Failed to obtain default bucket for Firebase Test Lab.")
-          FastlaneCore::UI.error(resp.body)
+          FastlaneCore::UI.abort_with_message!(ErrorHelper.summarize_google_error(resp.body))
           return nil
         else
           response_json = JSON.parse(resp.body)
@@ -115,8 +117,7 @@ module Fastlane
                                  "required during the beta testing. Click https://docs.google.com" \
                                  "/forms/d/e/1FAIpQLSf5cx1ot8ndHU9YrFkCn6gPoQZLxgW_6H13e_bot3he90n7Ng/viewform " \
                                  "to request access.")
-          FastlaneCore::UI.error(resp.body)
-          return nil
+          FastlaneCore::UI.abort_with_message!(ErrorHelper.summarize_google_error(resp.body))
         else
           response_json = JSON.parse(resp.body)
           return response_json["testMatrixId"]
@@ -142,7 +143,7 @@ module Fastlane
 
         if resp.status != 200
           FastlaneCore::UI.error("Failed to obtain test results.")
-          FastlaneCore::UI.error(resp.body)
+          FastlaneCore::UI.abort_with_message!(ErrorHelper.summarize_google_error(resp.body))
           return nil
         else
           return JSON.parse(resp.body)
