@@ -7,6 +7,7 @@ module Fastlane
         begin
           response = JSON.parse(payload)
         rescue JSON::ParserError
+          FastlaneCore::UI.error("Unable to parse error message: #{ex.class}, message: #{ex.message}")
           return payload
         end
 
