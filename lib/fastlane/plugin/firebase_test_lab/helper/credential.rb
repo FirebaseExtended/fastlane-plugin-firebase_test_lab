@@ -8,14 +8,24 @@ module Fastlane
       end
 
       def get_google_credential(scopes)
-        return Google::Auth.get_application_default(scopes) unless @key_file_path
+        unless @key_file_path
+          begin
+            return Google::Auth.get_application_default(scopes)
+          rescue Error => ex
+            UI.abort_with_message!("Failed reading application default credential. Either the Oauth credential should be provided or Google Application Default Credential should be configured: #{ex.message}")
+          end
+        end
 
-        File.open(@key_file_path, "r") do |file|
+        File.open(File.expand_path(@key_file_path), "r") do |file|
           options = {
             json_key_io: file,
             scope: scopes
           }
-          return Google::Auth::ServiceAccountCredentials.make_creds(options)
+          begin
+            return Google::Auth::ServiceAccountCredentials.make_creds(options)
+          rescue Error => ex
+            UI.abort_with_message!("Failed reading OAuth credential: #{ex.message}")
+          end
         end
       end
     end
