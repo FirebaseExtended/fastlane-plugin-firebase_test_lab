@@ -61,7 +61,13 @@ module Fastlane
 
         if resp.status != 200
           FastlaneCore::UI.error("Failed to obtain default bucket for Firebase Test Lab.")
-          FastlaneCore::UI.abort_with_message!(ErrorHelper.summarize_google_error(resp.body))
+          summarized_error = ErrorHelper.summarize_google_error(resp.body)
+          if summarized_error.include?("Not Authorized for project")
+            FastlaneCore::UI.error("Please make sure that the account associated with your Google credential is the " \
+                                   "project editor or owner. You can go to the Google Developer Console " \
+                                   "at https://console.cloud.google.com/ and configure that in the IAM page.")
+          end
+          FastlaneCore::UI.abort_with_message!(summarized_error)
           return nil
         else
           response_json = JSON.parse(resp.body)
