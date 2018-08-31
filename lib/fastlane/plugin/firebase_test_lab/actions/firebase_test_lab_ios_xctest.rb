@@ -111,9 +111,9 @@ module Fastlane
 
           state = results["state"]
           # Handle all known error statuses
-          if ERROR_STATE_TO_MESSAGE.key?(state)
+          if ERROR_STATE_TO_MESSAGE.key?(state.to_sym)
             spinner.error("Failed")
-            UI.user_error!(ERROR_STATE_TO_MESSAGE[state])
+            UI.user_error!(ERROR_STATE_TO_MESSAGE[state.to_sym])
             return false
           end
 

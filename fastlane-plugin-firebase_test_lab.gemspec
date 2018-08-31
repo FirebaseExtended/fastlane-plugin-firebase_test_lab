@@ -23,5 +23,5 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'tty-spinner', '>= 0.8.0', '< 1.0.0'
 
   spec.add_development_dependency 'bundler'
-  spec.add_development_dependency 'fastlane', '>= 2.101.0'
+  spec.add_development_dependency 'fastlane', '>= 2.102.0'
 end
