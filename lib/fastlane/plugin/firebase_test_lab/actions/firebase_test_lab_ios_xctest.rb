@@ -119,7 +119,23 @@ module Fastlane
 
           if state == "FINISHED"
             spinner.success("Done")
-            return handle_job_finished(results)
+            # Inspect the execution results: only contain info on whether each job finishes.
+            # Do not include whether tests fail
+            executions_completed = extract_execution_results(results)
+
+            # Now, look at the actual test result and see if they succeed
+            if !results["resultStorage"].nil? && !results["resultStorage"]["toolResultsExecution"].nil?
+              tool_results_execution = results["resultStorage"]["toolResultsExecution"]
+              history_id = tool_results_execution["historyId"]
+              execution_id = tool_results_execution["executionId"]
+              if history_id.nil? || execution_id.nil?
+                FastlaneCore::UI.abort_with_message!("Unexpected response: No history ID or execution ID")
+              end
+              test_results = ftl_service.get_execution_steps(gcp_project, history_id, execution_id)
+              return executions_completed && extract_test_results(test_results, gcp_project, history_id, execution_id)
+            else
+              return false
+            end
           end
 
           # We should have caught all known states here. If the state is not one of them, this
@@ -151,27 +167,73 @@ module Fastlane
           "/project/#{gcp_project}/testlab/histories/#{history_id}/matrices/#{execution_id}"
       end
 
-      def self.handle_job_finished(results)
-        UI.message("Test job(s) are completed")
+      def self.extract_execution_results(execution_results)
+        UI.message("Test job(s) are finalized")
         UI.message("-------------------------")
-        UI.message("|        RESULTS        |")
-        UI.message("-------------------------")
+        UI.message("|   EXECUTION RESULTS   |")
         failures = 0
-        for execution in results["testExecutions"]
-          execution_info = "#{execution['id']} is #{execution['state']}"
+        execution_results["testExecutions"].each do |execution|
+          UI.message("-------------------------")
+          execution_info = "#{execution['id']}: #{execution['state']}"
           if execution["state"] != "FINISHED"
             failures += 1
             UI.error(execution_info)
           else
             UI.success(execution_info)
           end
+
+          # Display build logs
+          if !execution["testDetails"].nil? && !execution["testDetails"]["progressMessages"].nil?
+            messages_arr = execution["testDetails"]["progressMessages"]
+            puts messages_arr.join("\n")
+          end
         end
 
+        UI.message("-------------------------")
         if failures > 0
-          UI.test_failure!("Some tests on Firebase Test Lab have failed")
+          UI.error("😞#{failures} execution(s) have failed to complete.")
           return false
         else
-          UI.success("🎉All job(s) finished successfully")
+          UI.success("🎉All jobs have ran and completed.")
+          return true
+        end
+      end
+
+      def self.extract_test_results(test_results, gcp_project, history_id, execution_id)
+        steps = test_results["steps"]
+        failures = 0
+        inconclusive_runs = 0
+
+        UI.message("-------------------------")
+        UI.message("|      TEST OUTCOME     |")
+        steps.each do |step|
+          UI.message("-------------------------")
+          step_id = step["stepId"]
+          UI.message("Test step: #{step_id}")
+
+          run_duration_sec = step["runDuration"]["seconds"] || 0
+          UI.message("Execution time: #{run_duration_sec} seconds")
+
+            outcome = step["outcome"]["summary"]
+          if outcome == "success"
+            UI.success("Result: #{outcome}")
+          elsif outcome == "inconclusive"
+            inconclusive_runs += 1
+            UI.error("Result: #{outcome}")
+          elsif outcome == "failure"
+            failures += 1
+            UI.error("Result: #{outcome}")
+          end
+          UI.message("For details, go to https://console.firebase.google.com/project/#{gcp_project}/testlab/histories/" \
+            "#{history_id}/matrices/#{execution_id}/executions/#{step_id}")
+        end
+
+        UI.message("-------------------------")
+        if failures > 0 || inconclusive_runs > 0
+          UI.error("😞#{failures} step(s) have failed, #{inconclusive_runs} step(s) yielded inconclusive outcomes.")
+          return false
+        else
+          UI.success("🎉Yay! All steps are completed successfully!")
           return true
         end
       end

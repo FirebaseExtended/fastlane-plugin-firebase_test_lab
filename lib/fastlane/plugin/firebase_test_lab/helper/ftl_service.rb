@@ -9,6 +9,8 @@ module Fastlane
       APIARY_ENDPOINT = "https://www.googleapis.com"
       TOOLRESULTS_GET_SETTINGS_API_V3 = "/toolresults/v1beta3/projects/{project}/settings"
       TOOLRESULTS_INITIALIZE_SETTINGS_API_V3 = "/toolresults/v1beta3/projects/{project}:initializeSettings"
+      TOOLRESULTS_LIST_EXECUTION_STEP_API_V3 =
+        "/toolresults/v1beta3/projects/{project}/histories/{history_id}/executions/{execution_id}/steps"
 
       FIREBASE_TEST_LAB_ENDPOINT = "https://testing.googleapis.com"
       FTL_CREATE_API = "/v1/projects/{project}/testMatrices"
@@ -19,6 +21,7 @@ module Fastlane
       private_constant :APIARY_ENDPOINT
       private_constant :TOOLRESULTS_GET_SETTINGS_API_V3
       private_constant :TOOLRESULTS_INITIALIZE_SETTINGS_API_V3
+      private_constant :TOOLRESULTS_LIST_EXECUTION_STEP_API_V3
       private_constant :FIREBASE_TEST_LAB_ENDPOINT
       private_constant :FTL_CREATE_API
       private_constant :FTL_RESULTS_API
@@ -154,6 +157,30 @@ module Fastlane
         else
           return JSON.parse(resp.body)
         end
+      end
+
+      def get_execution_steps(gcp_project, history_id, execution_id)
+        conn = Faraday.new(APIARY_ENDPOINT)
+        url = TOOLRESULTS_LIST_EXECUTION_STEP_API_V3
+                .gsub("{project}", gcp_project)
+                .gsub("{history_id}", history_id)
+                .gsub("{execution_id}", execution_id)
+        begin
+          resp = conn.get(url) do |req|
+            req.headers = @auth.apply(req.headers)
+            req.options.timeout = 15
+            req.options.open_timeout = 5
+          end
+        rescue Faraday::Error => ex
+          UI.abort_with_message!("Failed to obtain the metadata of test artifacts, " \
+            "type: #{ex.class}, message: #{ex.message}")
+        end
+
+        if resp.status != 200
+          FastlaneCore::UI.error("Failed to obtain the metadata of test artifacts.")
+          FastlaneCore::UI.abort_with_message!(ErrorHelper.summarize_google_error(resp.body))
+        end
+        return JSON.parse(resp.body)
       end
 
       def self.map_device_to_proto(device)
