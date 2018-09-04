@@ -64,8 +64,8 @@ module Fastlane
           summarized_error = ErrorHelper.summarize_google_error(resp.body)
           if summarized_error.include?("Not Authorized for project")
             FastlaneCore::UI.error("Please make sure that the account associated with your Google credential is the " \
-                                   "project editor or owner. You can go to the Google Developer Console " \
-                                   "at https://console.cloud.google.com/ and configure that in the IAM page.")
+                                   "project editor or owner. You can do this at the Google Developer Console " \
+                                   "https://console.cloud.google.com/iam-admin/iam?project=#{gcp_project}")
           end
           FastlaneCore::UI.abort_with_message!(summarized_error)
           return nil
