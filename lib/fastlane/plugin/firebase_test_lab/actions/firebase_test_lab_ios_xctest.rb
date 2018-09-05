@@ -99,9 +99,12 @@ module Fastlane
           results = ftl_service.get_matrix_results(gcp_project, matrix_id)
 
           if firebase_console_link.nil?
-            firebase_console_link = try_get_firebase_console_link(results, gcp_project)
-            # Once we get the Firebase console link, we display that once
-            unless firebase_console_link.nil?
+            history_id, execution_id = try_get_history_id_and_execution_id(results)
+            # Once we get the Firebase console link, we display that exactly once
+            unless history_id.nil? || execution_id.nil?
+              firebase_console_link = "https://console.firebase.google.com" \
+                "/project/#{gcp_project}/testlab/histories/#{history_id}/matrices/#{execution_id}"
+
               spinner.success("Done")
               UI.message("Go to #{firebase_console_link} for more information about this run")
               spinner = TTY::Spinner.new("[:spinner] Waiting for results...", format: :dots)
@@ -119,7 +122,21 @@ module Fastlane
 
           if state == "FINISHED"
             spinner.success("Done")
-            return handle_job_finished(results)
+            # Inspect the execution results: only contain info on whether each job finishes.
+            # Do not include whether tests fail
+            executions_completed = extract_execution_results(results)
+
+            if results["resultStorage"].nil? || results["resultStorage"]["toolResultsExecution"].nil?
+              return false
+            end
+
+            # Now, look at the actual test result and see if they succeed
+            history_id, execution_id = try_get_history_id_and_execution_id(results)
+            if history_id.nil? || execution_id.nil?
+              FastlaneCore::UI.abort_with_message!("Unexpected response: No history ID or execution ID")
+            end
+            test_results = ftl_service.get_execution_steps(gcp_project, history_id, execution_id)
+            return executions_completed && extract_test_results(test_results, gcp_project, history_id, execution_id)
           end
 
           # We should have caught all known states here. If the state is not one of them, this
@@ -139,41 +156,94 @@ module Fastlane
         return "fastlane-#{timestamp}-#{SecureRandom.hex[0..5]}"
       end
 
-      def self.try_get_firebase_console_link(results, gcp_project)
-        if results["resultStorage"].nil? || results["resultStorage"]["toolResultsExecution"].nil?
-          return nil
+      def try_get_history_id_and_execution_id(matrix_results)
+        if matrix_results["resultStorage"].nil? || matrix_results["resultStorage"]["toolResultsExecution"].nil?
+          return nil, nil
         end
 
-        tool_results_execution = results["resultStorage"]["toolResultsExecution"]
+        tool_results_execution = matrix_results["resultStorage"]["toolResultsExecution"]
         history_id = tool_results_execution["historyId"]
         execution_id = tool_results_execution["executionId"]
-        return "https://console.firebase.google.com" \
-          "/project/#{gcp_project}/testlab/histories/#{history_id}/matrices/#{execution_id}"
+        return history_id, execution_id
       end
 
-      def self.handle_job_finished(results)
-        UI.message("Test job(s) are completed")
+      def self.extract_execution_results(execution_results)
+        UI.message("Test job(s) are finalized")
         UI.message("-------------------------")
-        UI.message("|        RESULTS        |")
-        UI.message("-------------------------")
+        UI.message("|   EXECUTION RESULTS   |")
         failures = 0
-        for execution in results["testExecutions"]
-          execution_info = "#{execution['id']} is #{execution['state']}"
+        execution_results["testExecutions"].each do |execution|
+          UI.message("-------------------------")
+          execution_info = "#{execution['id']}: #{execution['state']}"
           if execution["state"] != "FINISHED"
             failures += 1
             UI.error(execution_info)
           else
             UI.success(execution_info)
           end
+
+          # Display build logs
+          if !execution["testDetails"].nil? && !execution["testDetails"]["progressMessages"].nil?
+            messages_arr = execution["testDetails"]["progressMessages"]
+            puts messages_arr.join("\n")
+          end
+        end
+
+        UI.message("-------------------------")
+        if failures > 0
+          UI.error("😞 #{failures} execution(s) have failed to complete.")
+          return false
+        else
+          UI.success("🎉 All jobs have ran and completed.")
+          return true
+        end
+      end
+
+      def self.extract_test_results(test_results, gcp_project, history_id, execution_id)
+        steps = test_results["steps"]
+        failures = 0
+        inconclusive_runs = 0
+
+        UI.message("-------------------------")
+        UI.message("|      TEST OUTCOME     |")
+        steps.each do |step|
+          UI.message("-------------------------")
+          step_id = step["stepId"]
+          UI.message("Test step: #{step_id}")
+
+          run_duration_sec = step["runDuration"]["seconds"] || 0
+          UI.message("Execution time: #{run_duration_sec} seconds")
+
+          outcome = step["outcome"]["summary"]
+          case outcome
+          when "success"
+            UI.success("Result: #{outcome}")
+          when "skipped"
+            UI.message("Result: #{outcome}")
+          when "inconclusive"
+            inconclusive_runs += 1
+            UI.error("Result: #{outcome}")
+          when "failure"
+            failures += 1
+            UI.error("Result: #{outcome}")
+          end
+          UI.message("For details, go to https://console.firebase.google.com/project/#{gcp_project}/testlab/histories/" \
+            "#{history_id}/matrices/#{execution_id}/executions/#{step_id}")
+        end
+
+        UI.message("-------------------------")
+        if failures == 0 && inconclusive_runs == 0
+          UI.success("🎉 Yay! All executions are completed successfully!")
+          return true
         end
 
         if failures > 0
-          UI.test_failure!("Some tests on Firebase Test Lab have failed")
-          return false
-        else
-          UI.success("🎉All job(s) finished successfully")
-          return true
+          UI.error("😞 #{failures} step(s) have failed.")
         end
+        if inconclusive_runs > 0
+          UI.error("😞 #{inconclusive_runs} step(s) yielded inconclusive outcomes.")
+        end
+        return false
       end
 
       #####################################################
