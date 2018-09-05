@@ -99,9 +99,12 @@ module Fastlane
           results = ftl_service.get_matrix_results(gcp_project, matrix_id)
 
           if firebase_console_link.nil?
-            firebase_console_link = try_get_firebase_console_link(results, gcp_project)
-            # Once we get the Firebase console link, we display that once
-            unless firebase_console_link.nil?
+            history_id, execution_id = try_get_history_id_and_execution_id(results)
+            # Once we get the Firebase console link, we display that exactly once
+            unless history_id.nil? || execution_id.nil?
+              firebase_console_link = "https://console.firebase.google.com" \
+                "/project/#{gcp_project}/testlab/histories/#{history_id}/matrices/#{execution_id}"
+
               spinner.success("Done")
               UI.message("Go to #{firebase_console_link} for more information about this run")
               spinner = TTY::Spinner.new("[:spinner] Waiting for results...", format: :dots)
@@ -128,9 +131,7 @@ module Fastlane
             end
 
             # Now, look at the actual test result and see if they succeed
-            tool_results_execution = results["resultStorage"]["toolResultsExecution"]
-            history_id = tool_results_execution["historyId"]
-            execution_id = tool_results_execution["executionId"]
+            history_id, execution_id = try_get_history_id_and_execution_id(results)
             if history_id.nil? || execution_id.nil?
               FastlaneCore::UI.abort_with_message!("Unexpected response: No history ID or execution ID")
             end
@@ -155,16 +156,15 @@ module Fastlane
         return "fastlane-#{timestamp}-#{SecureRandom.hex[0..5]}"
       end
 
-      def self.try_get_firebase_console_link(results, gcp_project)
-        if results["resultStorage"].nil? || results["resultStorage"]["toolResultsExecution"].nil?
-          return nil
+      def try_get_history_id_and_execution_id(matrix_results)
+        if matrix_results["resultStorage"].nil? || matrix_results["resultStorage"]["toolResultsExecution"].nil?
+          return nil, nil
         end
 
-        tool_results_execution = results["resultStorage"]["toolResultsExecution"]
+        tool_results_execution = matrix_results["resultStorage"]["toolResultsExecution"]
         history_id = tool_results_execution["historyId"]
         execution_id = tool_results_execution["executionId"]
-        return "https://console.firebase.google.com" \
-          "/project/#{gcp_project}/testlab/histories/#{history_id}/matrices/#{execution_id}"
+        return history_id, execution_id
       end
 
       def self.extract_execution_results(execution_results)
