@@ -123,19 +123,19 @@ module Fastlane
             # Do not include whether tests fail
             executions_completed = extract_execution_results(results)
 
-            # Now, look at the actual test result and see if they succeed
-            if !results["resultStorage"].nil? && !results["resultStorage"]["toolResultsExecution"].nil?
-              tool_results_execution = results["resultStorage"]["toolResultsExecution"]
-              history_id = tool_results_execution["historyId"]
-              execution_id = tool_results_execution["executionId"]
-              if history_id.nil? || execution_id.nil?
-                FastlaneCore::UI.abort_with_message!("Unexpected response: No history ID or execution ID")
-              end
-              test_results = ftl_service.get_execution_steps(gcp_project, history_id, execution_id)
-              return executions_completed && extract_test_results(test_results, gcp_project, history_id, execution_id)
-            else
+            if results["resultStorage"].nil? || results["resultStorage"]["toolResultsExecution"].nil?
               return false
             end
+
+            # Now, look at the actual test result and see if they succeed
+            tool_results_execution = results["resultStorage"]["toolResultsExecution"]
+            history_id = tool_results_execution["historyId"]
+            execution_id = tool_results_execution["executionId"]
+            if history_id.nil? || execution_id.nil?
+              FastlaneCore::UI.abort_with_message!("Unexpected response: No history ID or execution ID")
+            end
+            test_results = ftl_service.get_execution_steps(gcp_project, history_id, execution_id)
+            return executions_completed && extract_test_results(test_results, gcp_project, history_id, execution_id)
           end
 
           # We should have caught all known states here. If the state is not one of them, this
@@ -191,10 +191,10 @@ module Fastlane
 
         UI.message("-------------------------")
         if failures > 0
-          UI.error("😞#{failures} execution(s) have failed to complete.")
+          UI.error("😞 #{failures} execution(s) have failed to complete.")
           return false
         else
-          UI.success("🎉All jobs have ran and completed.")
+          UI.success("🎉 All jobs have ran and completed.")
           return true
         end
       end
@@ -214,13 +214,16 @@ module Fastlane
           run_duration_sec = step["runDuration"]["seconds"] || 0
           UI.message("Execution time: #{run_duration_sec} seconds")
 
-            outcome = step["outcome"]["summary"]
-          if outcome == "success"
+          outcome = step["outcome"]["summary"]
+          case outcome
+          when "success"
             UI.success("Result: #{outcome}")
-          elsif outcome == "inconclusive"
+          when "skipped"
+            UI.message("Result: #{outcome}")
+          when "inconclusive"
             inconclusive_runs += 1
             UI.error("Result: #{outcome}")
-          elsif outcome == "failure"
+          when "failure"
             failures += 1
             UI.error("Result: #{outcome}")
           end
@@ -229,13 +232,18 @@ module Fastlane
         end
 
         UI.message("-------------------------")
-        if failures > 0 || inconclusive_runs > 0
-          UI.error("😞#{failures} step(s) have failed, #{inconclusive_runs} step(s) yielded inconclusive outcomes.")
-          return false
-        else
-          UI.success("🎉Yay! All steps are completed successfully!")
+        if failures == 0 && inconclusive_runs == 0
+          UI.success("🎉 Yay! All executions are completed successfully!")
           return true
         end
+
+        if failures > 0
+          UI.error("😞 #{failures} step(s) have failed.")
+        end
+        if inconclusive_runs > 0
+          UI.error("😞 #{inconclusive_runs} step(s) yielded inconclusive outcomes.")
+        end
+        return false
       end
 
       #####################################################
