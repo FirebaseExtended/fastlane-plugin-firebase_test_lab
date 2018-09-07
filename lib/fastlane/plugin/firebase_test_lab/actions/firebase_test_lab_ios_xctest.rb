@@ -156,7 +156,7 @@ module Fastlane
         return "fastlane-#{timestamp}-#{SecureRandom.hex[0..5]}"
       end
 
-      def try_get_history_id_and_execution_id(matrix_results)
+      def self.try_get_history_id_and_execution_id(matrix_results)
         if matrix_results["resultStorage"].nil? || matrix_results["resultStorage"]["toolResultsExecution"].nil?
           return nil, nil
         end
