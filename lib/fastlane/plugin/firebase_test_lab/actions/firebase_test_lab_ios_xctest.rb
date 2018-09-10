@@ -132,8 +132,7 @@ module Fastlane
             # Now, look at the actual test result and see if they succeed
             history_id, execution_id = try_get_history_id_and_execution_id(results)
             if history_id.nil? || execution_id.nil?
-              FastlaneCore::UI.abort_with_message!("Unexpected response from Firebase test lab: No history or " \
-                                                   "execution ID")
+              UI.abort_with_message!("Unexpected response from Firebase test lab: No history or execution ID")
             end
             test_results = ftl_service.get_execution_steps(gcp_project, history_id, execution_id)
             tests_successful = extract_test_results(test_results, gcp_project, history_id, execution_id)
@@ -188,8 +187,7 @@ module Fastlane
 
           # Display build logs
           if !execution["testDetails"].nil? && !execution["testDetails"]["progressMessages"].nil?
-            messages_arr = execution["testDetails"]["progressMessages"]
-            puts messages_arr.join("\n")
+            execution["testDetails"]["progressMessages"].each {|msg| UI.message(msg)}
           end
         end
 
@@ -230,8 +228,8 @@ module Fastlane
             failures += 1
             UI.error("Result: #{outcome}")
           end
-          UI.message("For details, go to https://console.firebase.google.com/project/#{gcp_project}/testlab/histories/" \
-            "#{history_id}/matrices/#{execution_id}/executions/#{step_id}")
+          UI.message("For details, go to https://console.firebase.google.com/project/#{gcp_project}/testlab/" \
+            "histories/#{history_id}/matrices/#{execution_id}/executions/#{step_id}")
         end
 
         UI.message("-------------------------")
