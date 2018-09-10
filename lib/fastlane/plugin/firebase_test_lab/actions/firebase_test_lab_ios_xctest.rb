@@ -126,13 +126,14 @@ module Fastlane
             executions_completed = extract_execution_results(results)
 
             if results["resultStorage"].nil? || results["resultStorage"]["toolResultsExecution"].nil?
-              UI.abort_with_message!("Unexpected error: Cannot retrieve result info")
+              UI.abort_with_message!("Unexpected response from Firebase test lab: Cannot retrieve result info")
             end
 
             # Now, look at the actual test result and see if they succeed
             history_id, execution_id = try_get_history_id_and_execution_id(results)
             if history_id.nil? || execution_id.nil?
-              FastlaneCore::UI.abort_with_message!("Unexpected response: No history ID or execution ID")
+              FastlaneCore::UI.abort_with_message!("Unexpected response from Firebase test lab: No history or " \
+                                                   "execution ID")
             end
             test_results = ftl_service.get_execution_steps(gcp_project, history_id, execution_id)
             tests_successful = extract_test_results(test_results, gcp_project, history_id, execution_id)
