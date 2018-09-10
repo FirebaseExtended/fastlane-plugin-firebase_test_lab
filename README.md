@@ -34,7 +34,6 @@ No matter you are a using an automatically provisioned service account or a manu
 - You need to enable the following APIs on your [Google Cloud API library](https://console.cloud.google.com/apis/library) (see [this](https://support.google.com/cloud/answer/6158841) for how):
   1. Cloud Testing API
   2. Cloud Tool Results API
-  3. Service Management API
 
 ### Find out the devices you want to test on
 If you have [gcloud tool](https://cloud.google.com/sdk/gcloud/), you can run
@@ -54,8 +53,10 @@ All available devices can also be seen [here](https://firebase.google.com/docs/t
 Submit your iOS app to Firebase Test Lab and run XCTest. Refer to [this document](https://firebase.google.com/docs/test-lab/ios/command-line) for more details about Firebase Test Lab specific arguments.
 ```ruby
 scan(
-  project: 'YourApp.xcodeproj',       # Path to the Xcode project file
   scheme: 'YourApp',                  # XCTest scheme
+  clean: true,                        # Recommended: This would ensure the build would not include unnecessary files
+  skip_detect_devices: true,          # Required
+  build_for_testing: true,            # Required
   sdk: 'iphoneos',                    # Required
   should_zip_build_products: true     # Must be true to set the correct format for Firebase Test Lab
 )
