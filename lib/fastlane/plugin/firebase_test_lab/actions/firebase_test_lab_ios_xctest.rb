@@ -75,10 +75,10 @@ module Fastlane
         UI.message("Matrix ID for this submission: #{matrix_id}")
         if params[:async]
           UI.success("Job(s) have been submitted to Firebase Test Lab")
-          return true
+          return
         end
 
-        return wait_for_test_results(ftl_service, gcp_project, matrix_id)
+        wait_for_test_results(ftl_service, gcp_project, matrix_id)
       end
 
       def self.upload_file(app_path, bucket_name, gcs_path, gcp_project, gcp_credential)
@@ -117,7 +117,6 @@ module Fastlane
           if ERROR_STATE_TO_MESSAGE.key?(state.to_sym)
             spinner.error("Failed")
             UI.user_error!(ERROR_STATE_TO_MESSAGE[state.to_sym])
-            return false
           end
 
           if state == "FINISHED"
@@ -127,16 +126,21 @@ module Fastlane
             executions_completed = extract_execution_results(results)
 
             if results["resultStorage"].nil? || results["resultStorage"]["toolResultsExecution"].nil?
-              return false
+              UI.abort_with_message!("Unexpected response from Firebase test lab: Cannot retrieve result info")
             end
 
             # Now, look at the actual test result and see if they succeed
             history_id, execution_id = try_get_history_id_and_execution_id(results)
             if history_id.nil? || execution_id.nil?
-              FastlaneCore::UI.abort_with_message!("Unexpected response: No history ID or execution ID")
+              FastlaneCore::UI.abort_with_message!("Unexpected response from Firebase test lab: No history or " \
+                                                   "execution ID")
             end
             test_results = ftl_service.get_execution_steps(gcp_project, history_id, execution_id)
-            return executions_completed && extract_test_results(test_results, gcp_project, history_id, execution_id)
+            tests_successful = extract_test_results(test_results, gcp_project, history_id, execution_id)
+            unless executions_completed && tests_successful
+              UI.test_failure!("Tests failed")
+            end
+            return
           end
 
           # We should have caught all known states here. If the state is not one of them, this
@@ -191,12 +195,11 @@ module Fastlane
 
         UI.message("-------------------------")
         if failures > 0
-          UI.error("😞 #{failures} execution(s) have failed to complete.")
-          return false
+          UI.error("😞  #{failures} execution(s) have failed to complete.")
         else
-          UI.success("🎉 All jobs have ran and completed.")
-          return true
+          UI.success("🎉  All jobs have ran and completed.")
         end
+        return failures == 0
       end
 
       def self.extract_test_results(test_results, gcp_project, history_id, execution_id)
@@ -233,17 +236,15 @@ module Fastlane
 
         UI.message("-------------------------")
         if failures == 0 && inconclusive_runs == 0
-          UI.success("🎉 Yay! All executions are completed successfully!")
-          return true
+          UI.success("🎉  Yay! All executions are completed successfully!")
         end
-
         if failures > 0
-          UI.error("😞 #{failures} step(s) have failed.")
+          UI.error("😞  #{failures} step(s) have failed.")
         end
         if inconclusive_runs > 0
-          UI.error("😞 #{inconclusive_runs} step(s) yielded inconclusive outcomes.")
+          UI.error("😞  #{inconclusive_runs} step(s) yielded inconclusive outcomes.")
         end
-        return false
+        return failures == 0 && inconclusive_runs == 0
       end
 
       #####################################################
