@@ -18,9 +18,6 @@ You need to set up Firebase first. These only needs to be done once for an organ
 - If you have not used Google Cloud before, you need to [create a new Google Cloud project](https://cloud.google.com/resource-manager/docs/creating-managing-projects#Creating%20a%20Project) first.
 - Go to the [Firebase Console](https://console.firebase.google.com/). Add Firebase into your Google Cloud project by clicking on "Add project" and then choose your just-created project..
 
-### Firebase Test Lab iOS beta signup
-During the beta test period, your Google Cloud Project must be enrolled in the beta tester program in order to run tests on iOS devices. You may click [this link](https://docs.google.com/forms/d/e/1FAIpQLSf5cx1ot8ndHU9YrFkCn6gPoQZLxgW_6H13e_bot3he90n7Ng/viewform) to sign up.
-
 ### Configure Google credentials through service accounts
 To authenticate, Google Cloud credentials will need to be set for any machine where fastlane and this plugin runs on.
 
