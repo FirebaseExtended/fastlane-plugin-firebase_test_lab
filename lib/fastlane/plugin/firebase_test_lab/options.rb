@@ -12,7 +12,6 @@ module Fastlane
                                        description: "Path to the app, either on the filesystem or GCS address (gs://)",
                                        default_value:
                                          Actions.lane_context[Actions::SharedValues::SCAN_ZIP_BUILD_PRODUCTS_PATH],
-                                       optional: true,
                                        verify_block: proc do |value|
                                          unless value.to_s.start_with?("gs://")
                                            v = File.expand_path(value.to_s)
