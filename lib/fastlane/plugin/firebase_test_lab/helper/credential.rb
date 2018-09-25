@@ -11,7 +11,7 @@ module Fastlane
         unless @key_file_path
           begin
             return Google::Auth.get_application_default(scopes)
-          rescue Error => ex
+          rescue => ex
             UI.abort_with_message!("Failed reading application default credential. Either the Oauth credential should be provided or Google Application Default Credential should be configured: #{ex.message}")
           end
         end
@@ -23,7 +23,7 @@ module Fastlane
           }
           begin
             return Google::Auth::ServiceAccountCredentials.make_creds(options)
-          rescue Error => ex
+          rescue => ex
             UI.abort_with_message!("Failed reading OAuth credential: #{ex.message}")
           end
         end
