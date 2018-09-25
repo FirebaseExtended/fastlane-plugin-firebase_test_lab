@@ -40,6 +40,13 @@ module Fastlane
         # The default Google Cloud Storage path we store app bundle and test results
         gcs_workfolder = generate_directory_name
 
+        if params[:app_path].nil?
+          UI.user_error!("app_path argument is not provided, and no build artifact through the scan action is " \
+                         "detected, so we do not know where your app is! Please either provide the path to the " \
+                         "app or add the scan action before this Firebase Test Lab action. See " \
+                         "https://github.com/fastlane/fastlane-plugin-firebase_test_lab for details.")
+        end
+
         # Firebase Test Lab requires an app bundle be already on Google Cloud Storage before starting the job
         if params[:app_path].to_s.start_with?("gs://")
           # gs:// is a path on Google Cloud Storage, we do not need to re-upload the app to a different bucket
