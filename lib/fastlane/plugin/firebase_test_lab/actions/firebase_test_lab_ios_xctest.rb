@@ -120,6 +120,9 @@ module Fastlane
           # Handle all known error statuses
           if ERROR_STATE_TO_MESSAGE.key?(state.to_sym)
             spinner.error("Failed")
+            if results["invalidMatrixDetails"]
+              UI.error("The matrix is invalid because of #{results['invalidMatrixDetails']}")
+            end
             UI.user_error!(ERROR_STATE_TO_MESSAGE[state.to_sym])
           end
 
