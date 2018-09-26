@@ -23,7 +23,7 @@ module Fastlane
         INCOMPATIBLE_ARCHITECTURE: "The execution was not run because the provided inputs are incompatible with the " \
                                    "requested architecture.",
         CANCELLED: "The user cancelled the execution.",
-        INVALID: "The execution or matrix was not run because the provided inputs are not valid.",
+        INVALID: "The execution or matrix was not run because the provided inputs are not valid."
       }
 
       private_constant :DEFAULT_APP_BUNDLE_NAME
@@ -61,7 +61,7 @@ module Fastlane
         end
 
         UI.message("Submitting job(s) to Firebase Test Lab")
-        result_storage = (params[:result_storage] or
+        result_storage = (params[:result_storage] ||
           "gs://#{ftl_service.get_default_bucket(gcp_project)}/#{gcs_workfolder}")
 
         # We have gathered all the information. Call Firebase Test Lab to start the job now
@@ -93,7 +93,7 @@ module Fastlane
         spinner.auto_spin
 
         # Keep pulling test results until they are ready
-        while true
+        loop do
           results = ftl_service.get_matrix_results(gcp_project, matrix_id)
 
           if firebase_console_link.nil?
@@ -159,7 +159,7 @@ module Fastlane
       end
 
       def self.generate_directory_name
-        timestamp = Time.now.getutc.strftime "%Y%m%d-%H%M%SZ"
+        timestamp = Time.now.getutc.strftime("%Y%m%d-%H%M%SZ")
         return "fastlane-#{timestamp}-#{SecureRandom.hex[0..5]}"
       end
 
@@ -191,7 +191,7 @@ module Fastlane
 
           # Display build logs
           if !execution["testDetails"].nil? && !execution["testDetails"]["progressMessages"].nil?
-            execution["testDetails"]["progressMessages"].each {|msg| UI.message(msg)}
+            execution["testDetails"]["progressMessages"].each { |msg| UI.message(msg) }
           end
         end
 

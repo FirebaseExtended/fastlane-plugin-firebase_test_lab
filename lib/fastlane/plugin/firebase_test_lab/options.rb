@@ -33,8 +33,10 @@ module Fastlane
                                            UI.user_error!("Devices cannot be empty")
                                          end
                                          value.each do |current|
-                                           UI.user_error!("Each device must be represented by a Hash object, " +
-                                             "#{current.class} found") if current.class != Hash
+                                           if current.class != Hash
+                                             UI.user_error!("Each device must be represented by a Hash object, " \
+                                               "#{current.class} found")
+                                           end
                                            check_has_property(current, :ios_model_id)
                                            check_has_property(current, :ios_version_id)
                                            set_default_property(current, :locale, "en_US")
@@ -61,24 +63,24 @@ module Fastlane
                                            unless value.to_s.start_with?("gs://")
                                        end),
           FastlaneCore::ConfigItem.new(key: :oauth_key_file_path,
-                                       description: "Use the given Google cloud service key file." +\
-                                                    "If not set, application default credential will be used " +\
+                                       description: "Use the given Google cloud service key file." \
+                                                    "If not set, application default credential will be used " \
                                                     "(see https://cloud.google.com/docs/authentication/production)",
                                        default_value: nil,
                                        optional: true,
                                        verify_block: proc do |value|
                                          v = File.expand_path(value.to_s)
                                          UI.user_error!("Key file not found at path '#{v}'") unless File.exist?(v)
-                                       end),
+                                       end)
         ]
       end
 
       def self.check_has_property(hash_obj, property)
-        UI.user_error!("Each device must have #{property} property") unless hash_obj.has_key?(property)
+        UI.user_error!("Each device must have #{property} property") unless hash_obj.key?(property)
       end
 
       def self.set_default_property(hash_obj, property, default)
-        unless hash_obj.has_key?(property)
+        unless hash_obj.key?(property)
           hash_obj[property] = default
         end
       end
