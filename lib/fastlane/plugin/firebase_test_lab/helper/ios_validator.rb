@@ -5,8 +5,9 @@ module Fastlane
   module FirebaseTestLab
     class IosValidator
       def self.validate_ios_app(file_path)
+        absolute_path = File.expand_path(file_path)
         begin
-          Zip::File.open(file_path) do |zip_file|
+          Zip::File.open(absolute_path) do |zip_file|
             xctestrun_files = zip_file.glob("*.xctestrun")
             if xctestrun_files.size != 1
               UI.user_error!("app verification failed: There must be only one .xctestrun files in the ZIP file.")
