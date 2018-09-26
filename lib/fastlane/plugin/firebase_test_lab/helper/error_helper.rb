@@ -12,7 +12,7 @@ module Fastlane
         end
 
         if response["error"]
-          return response["error"]["message"] + "\n" + payload
+          return "#{response["error"]["message"]}\n#{payload}"
         end
         return payload
       end
