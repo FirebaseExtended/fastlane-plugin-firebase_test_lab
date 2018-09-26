@@ -48,8 +48,10 @@ module Fastlane
                                        description: "After how long, in seconds, should tests be terminated",
                                        default_value: 180,
                                        optional: true,
+                                       type: Integer,
                                        verify_block: proc do |value|
-                                         UI.user_error!("Timeout must be a positive number") if value <= 0
+                                         UI.user_error!("Timeout must be less or equal to 45 minutes.") \
+                                           if value <= 0 || value > 45 * 60
                                        end),
           FastlaneCore::ConfigItem.new(key: :result_storage,
                                        description: "GCS path to store test results",
