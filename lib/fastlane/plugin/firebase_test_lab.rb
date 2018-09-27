@@ -1,4 +1,4 @@
-require 'fastlane/plugin/firebase_test_lab/version'
+require 'fastlane/plugin/firebase_test_lab/module'
 
 module Fastlane
   module FirebaseTestLab
