@@ -2,6 +2,7 @@ require 'googleauth'
 require 'json'
 
 require_relative './error_helper'
+require_relative '../meta'
 
 module Fastlane
   module FirebaseTestLab
@@ -102,6 +103,15 @@ module Fastlane
             googleCloudStorage: {
               gcsPath: result_path
             }
+          },
+          clientInfo: {
+            name: PLUGIN_NAME,
+            clientInfoDetails: [
+              {
+                key: "version",
+                value: VERSION
+              }
+            ]
           }
         }
 

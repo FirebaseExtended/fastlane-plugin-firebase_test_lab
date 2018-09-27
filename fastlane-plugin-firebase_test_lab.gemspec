@@ -1,7 +1,7 @@
 
 lib = File.expand_path("../lib", __FILE__)
 $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
-require 'fastlane/plugin/firebase_test_lab/version'
+require 'fastlane/plugin/firebase_test_lab/meta'
 
 Gem::Specification.new do |spec|
   spec.name          = 'fastlane-plugin-firebase_test_lab'
