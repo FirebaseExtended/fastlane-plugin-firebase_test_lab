@@ -10,7 +10,7 @@ Gem::Specification.new do |spec|
   spec.email         = 'shihuaz@google.com'
 
   spec.summary       = 'Firebase Test Lab for fastlane'
-  spec.homepage      = "https://github.com/fastlane/fastlane-plugin-ftl"
+  spec.homepage      = "https://github.com/fastlane/fastlane-plugin-firebase_test_lab"
   spec.license       = "MIT"
 
   spec.files         = Dir["lib/**/*"] + %w(README.md LICENSE)
