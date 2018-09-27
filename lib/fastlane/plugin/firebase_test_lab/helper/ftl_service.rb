@@ -141,8 +141,8 @@ module Fastlane
 
       def get_matrix_results(gcp_project, matrix_id)
         url = FTL_RESULTS_API
-                .gsub("{project}", gcp_project)
-                .gsub("{matrix}", matrix_id)
+              .gsub("{project}", gcp_project)
+              .gsub("{matrix}", matrix_id)
 
         conn = Faraday.new(FIREBASE_TEST_LAB_ENDPOINT)
         begin
@@ -168,9 +168,9 @@ module Fastlane
       def get_execution_steps(gcp_project, history_id, execution_id)
         conn = Faraday.new(APIARY_ENDPOINT)
         url = TOOLRESULTS_LIST_EXECUTION_STEP_API_V3
-                .gsub("{project}", gcp_project)
-                .gsub("{history_id}", history_id)
-                .gsub("{execution_id}", execution_id)
+              .gsub("{project}", gcp_project)
+              .gsub("{history_id}", history_id)
+              .gsub("{execution_id}", execution_id)
         begin
           resp = conn.get(url) do |req|
             req.headers = @auth.apply(req.headers)
@@ -194,7 +194,7 @@ module Fastlane
           iosModelId: device[:ios_model_id],
           iosVersionId: device[:ios_version_id],
           locale: device[:locale],
-          orientation: device[:orientation],
+          orientation: device[:orientation]
         }
       end
     end
