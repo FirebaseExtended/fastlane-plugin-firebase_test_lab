@@ -84,6 +84,8 @@ Arguments available are:
 
 If you have any other issues and feedback about this plugin, we appreciate if you could submit an issue to this repository.
 
+You can also join the Firebase slack channel [here](https://firebase.community/).
+
 ## Troubleshooting
 
 For some more detailed help with plugins problems, check out the [Plugins Troubleshooting](https://github.com/fastlane/fastlane/blob/master/fastlane/docs/PluginsTroubleshooting.md) doc in the main `fastlane` repo.
