@@ -1,4 +1,5 @@
 require_relative '../helper/ftl_service'
+require_relative '../helper/ftl_message'
 require_relative '../helper/storage'
 require_relative '../helper/credential'
 require_relative '../helper/ios_validator'
@@ -15,21 +16,10 @@ module Fastlane
       PULL_RESULT_INTERVAL = 5
 
       RUNNING_STATES = %w(VALIDATING PENDING RUNNING)
-      ERROR_STATE_TO_MESSAGE = {
-        ERROR: "The execution or matrix has stopped because it encountered an infrastructure failure.",
-        UNSUPPORTED_ENVIRONMENT: "The execution was not run because it corresponds to a unsupported environment.",
-        INCOMPATIBLE_ENVIRONMENT: "The execution was not run because the provided inputs are incompatible with the " \
-                                  "requested environment",
-        INCOMPATIBLE_ARCHITECTURE: "The execution was not run because the provided inputs are incompatible with the " \
-                                   "requested architecture.",
-        CANCELLED: "The user cancelled the execution.",
-        INVALID: "The execution or matrix was not run because the provided inputs are not valid."
-      }
 
       private_constant :DEFAULT_APP_BUNDLE_NAME
       private_constant :PULL_RESULT_INTERVAL
       private_constant :RUNNING_STATES
-      private_constant :ERROR_STATE_TO_MESSAGE
 
       def self.run(params)
         gcp_project = params[:gcp_project]
@@ -118,9 +108,14 @@ module Fastlane
 
           state = results["state"]
           # Handle all known error statuses
-          if ERROR_STATE_TO_MESSAGE.key?(state.to_sym)
+          if FirebaseTestLab::ERROR_STATE_TO_MESSAGE.key?(state.to_sym)
             spinner.error("Failed")
-            UI.user_error!(ERROR_STATE_TO_MESSAGE[state.to_sym])
+            invalid_matrix_details = results["invalidMatrixDetails"]
+            if invalid_matrix_details &&
+               FirebaseTestLab::INVALID_MATRIX_DETAIL_TO_MESSAGE.key?(invalid_matrix_details.to_sym)
+              UI.error(FirebaseTestLab::INVALID_MATRIX_DETAIL_TO_MESSAGE[invalid_matrix_details.to_sym])
+            end
+            UI.user_error!(FirebaseTestLab::ERROR_STATE_TO_MESSAGE[state.to_sym])
           end
 
           if state == "FINISHED"
