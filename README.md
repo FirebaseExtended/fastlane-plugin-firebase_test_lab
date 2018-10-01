@@ -6,6 +6,10 @@ This project is a [fastlane](https://fastlane.tools) plugin. You can add it to y
 fastlane add_plugin firebase_test_lab
 ```
 
+---
+
+[![fastlane Firebase Test Lab plugin](https://rawcdn.githack.com/fastlane/fastlane/master/fastlane/assets/plugin-badge.svg)](https://rubygems.org/gems/fastlane-plugin-firebase_test_lab)
+
 ## About Firebase Test Lab plugin
 
 [Firebase Test Lab](https://firebase.google.com/docs/test-lab/) let you easily test your iOS and Android app on a variety of real or virtual devices and configurations with just one API call. This plugin allows you to submit your app to Firebase Test Lab by adding an action into Fastfile.
