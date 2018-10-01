@@ -1,6 +1,6 @@
 # `Firebase Test Lab` Plugin for fastlane
 
-This project is a [fastlane](https://fastlane.tools) plugin. You can add it to your [fastlane](https://fastlane.tools) project by running
+This project is a [fastlane](https://fastlane.tools) plugin. You can add it to your _fastlane_ project by running
 
 ```bash
 fastlane add_plugin firebase_test_lab
@@ -12,7 +12,7 @@ fastlane add_plugin firebase_test_lab
 
 ## About Firebase Test Lab plugin
 
-[Firebase Test Lab](https://firebase.google.com/docs/test-lab/) let you easily test your iOS and Android app on a variety of real or virtual devices and configurations with just one API call. This plugin allows you to submit your app to Firebase Test Lab by adding an action into Fastfile.
+[Firebase Test Lab](https://firebase.google.com/docs/test-lab/) let you easily test your iOS app (Android support forthcoming) on a variety of real or virtual devices and configurations. This plugin allows you to submit your app to Firebase Test Lab by adding an action into Fastfile.
 
 ## Getting started
 
@@ -23,7 +23,7 @@ You need to set up Firebase first. These only needs to be done once for an organ
 - Go to the [Firebase Console](https://console.firebase.google.com/). Add Firebase into your Google Cloud project by clicking on "Add project" and then choose your just-created project..
 
 ### Configure Google credentials through service accounts
-To authenticate, Google Cloud credentials will need to be set for any machine where fastlane and this plugin runs on.
+To authenticate, Google Cloud credentials will need to be set for any machine where _fastlane_ and this plugin runs on.
 
 If you are running this plugin on Google Cloud [Compute Engine](https://cloud.google.com/compute), [Kubernetes Engine](https://cloud.google.com/kubernetes-engine) or [App Engine flexible environment](https://cloud.google.com/appengine/docs/flexible/), a default service account is automatically provisioned. You will not need to create a service account. See [this](https://cloud.google.com/compute/docs/access/service-accounts#compute_engine_default_service_account) for more details.
 
