@@ -39,7 +39,7 @@ No matter you are a using an automatically provisioned service account or a manu
 ### Find out the devices you want to test on
 If you have [gcloud tool](https://cloud.google.com/sdk/gcloud/), you can run
 
-```bash
+```no-highlight
 gcloud beta firebase test ios models list
 ```
 This will return a list of supported devices and their identifiers.
@@ -49,7 +49,7 @@ All available devices can also be seen [here](https://firebase.google.com/docs/t
 
 ## Actions
 
-### firebase_test_lab_ios_xctest
+### `firebase_test_lab_ios_xctest`
 
 Submit your iOS app to Firebase Test Lab and run XCTest. Refer to [this document](https://firebase.google.com/docs/test-lab/ios/command-line) for more details about Firebase Test Lab specific arguments.
 ```ruby
@@ -74,7 +74,7 @@ firebase_test_lab_ios_xctest(
 )
 ```
 
-Arguments available are:
+**Available parameters:**
 
 - `app_path` You may provide a different path in the local filesystem (e.g: `/path/to/app-bundle.zip`) or on Google Cloud Storage (`gs://your-bucket/path/to/app-bundle.zip`) that points to an app bundle as specified [here](https://firebase.google.com/docs/test-lab/ios/command-line#build_xctests_for_your_app). If a Google Cloud Storage path is used, the service account must have read access to such file.
 - `gcp_project` The Google Cloud project name for Firebase Test Lab to run on.
@@ -92,12 +92,12 @@ You can also join the Firebase slack channel [here](https://firebase.community/)
 
 ## Troubleshooting
 
-For some more detailed help with plugins problems, check out the [Plugins Troubleshooting](https://github.com/fastlane/fastlane/blob/master/fastlane/docs/PluginsTroubleshooting.md) doc in the main `fastlane` repo.
+For some more detailed help with plugins problems, check out the [Plugins Troubleshooting](https://github.com/fastlane/fastlane/blob/master/fastlane/docs/PluginsTroubleshooting.md) doc in the main _fastlane_ repo.
 
-## Using `fastlane` Plugins
+## Using _fastlane_ Plugins
 
-For more information about how the `fastlane` plugin system works, check out the [Plugins documentation](https://github.com/fastlane/fastlane/blob/master/fastlane/docs/Plugins.md) in the main `fastlane` repo.
+For more information about how the _fastlane_ plugin system works, check out the [Plugins documentation](https://github.com/fastlane/fastlane/blob/master/fastlane/docs/Plugins.md) in the main _fastlane_ repo.
 
-## About `fastlane`
+## About _fastlane_
 
-`fastlane` automates building, testing, and releasing your app for beta and app store distributions. To learn more about `fastlane`, check out [fastlane.tools](https://fastlane.tools).
+_fastlane_ automates building, testing, and releasing your app for beta and app store distributions. To learn more about _fastlane_, check out [fastlane.tools](https://fastlane.tools).
