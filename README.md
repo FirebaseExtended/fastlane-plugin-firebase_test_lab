@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="./testlab.png" width="400" />
+</p>
+
 # `Firebase Test Lab` plugin for _fastlane_
 
 This project is a [fastlane](https://fastlane.tools) plugin. You can add it to your _fastlane_ project by running
@@ -13,10 +17,6 @@ fastlane add_plugin firebase_test_lab
 ## About Firebase Test Lab plugin
 
 [Firebase Test Lab](https://firebase.google.com/docs/test-lab/) let you easily test your iOS app (Android support forthcoming) on a variety of real or virtual devices and configurations. This plugin allows you to submit your app to Firebase Test Lab by adding an action into Fastfile.
-
-<p align="center">
-  <img src="./testlab.png" width="400" />
-</p>
 
 ## Getting started
 
