@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="./testlab.png" width="400" />
+</p>
+
 # `Firebase Test Lab` plugin for _fastlane_
 
 This project is a [fastlane](https://fastlane.tools) plugin. You can add it to your _fastlane_ project by running
