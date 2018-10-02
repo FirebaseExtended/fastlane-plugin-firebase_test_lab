@@ -9,7 +9,7 @@ Gem::Specification.new do |spec|
   spec.author        = 'Shihua Zheng'
   spec.email         = 'shihuaz@google.com'
 
-  spec.summary       = 'Firebase Test Lab for fastlane'
+  spec.summary       = 'Test your app with Firebase Test Lab with ease using fastlane'
   spec.homepage      = "https://github.com/fastlane/fastlane-plugin-firebase_test_lab"
   spec.license       = "MIT"
 
