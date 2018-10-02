@@ -16,46 +16,51 @@ fastlane add_plugin firebase_test_lab
 
 ## About Firebase Test Lab plugin
 
-[Firebase Test Lab](https://firebase.google.com/docs/test-lab/) let you easily test your iOS app (Android support forthcoming) on a variety of real or virtual devices and configurations. This plugin allows you to submit your app to Firebase Test Lab by adding an action into Fastfile.
+[Firebase Test Lab](https://firebase.google.com/docs/test-lab/) let you easily test your iOS app (Android support forthcoming) on a variety of real or virtual devices and configurations. This plugin allows you to submit your app to Firebase Test Lab by adding an action into your `Fastfile`.
 
 ## Getting started
 
 ### If you are not current user of Firebase
+
 You need to set up Firebase first. These only needs to be done once for an organization.
 
 - If you have not used Google Cloud before, you need to [create a new Google Cloud project](https://cloud.google.com/resource-manager/docs/creating-managing-projects#Creating%20a%20Project) first.
-- Go to the [Firebase Console](https://console.firebase.google.com/). Add Firebase into your Google Cloud project by clicking on "Add project" and then choose your just-created project..
+- Go to the [Firebase Console](https://console.firebase.google.com/). Add Firebase into your Google Cloud project by clicking on "Add project" and then choose your just-created project.
 
 ### Configure Google credentials through service accounts
+
 To authenticate, Google Cloud credentials will need to be set for any machine where _fastlane_ and this plugin runs on.
 
 If you are running this plugin on Google Cloud [Compute Engine](https://cloud.google.com/compute), [Kubernetes Engine](https://cloud.google.com/kubernetes-engine) or [App Engine flexible environment](https://cloud.google.com/appengine/docs/flexible/), a default service account is automatically provisioned. You will not need to create a service account. See [this](https://cloud.google.com/compute/docs/access/service-accounts#compute_engine_default_service_account) for more details.
 
-In all other cases, you would need to configure the service account manually. You can follow [this guide](https://cloud.google.com/docs/authentication/getting-started) on how to create a new service account and create a key for it. You will need to set the `GOOGLE_APPLICATION_CREDENTIALS` environment variable pointing to the service account key file according to the document.
+In all other cases, you need to configure the service account manually. You can follow [this guide](https://cloud.google.com/docs/authentication/getting-started) on how to create a new service account and create a key for it. You will need to set the `GOOGLE_APPLICATION_CREDENTIALS` environment variable pointing to the service account key file according to the document.
 
-No matter you are a using an automatically provisioned service account or a manually created one, the service account must be configured to have project editor role.
+No matter if you are a using an automatically provisioned service account or a manually created one, the service account must be configured to have the project editor role.
 
 ### Enable relevant Google APIs
-- You need to enable the following APIs on your [Google Cloud API library](https://console.cloud.google.com/apis/library) (see [this](https://support.google.com/cloud/answer/6158841) for how):
+
+- You need to enable the following APIs on your [Google Cloud API library](https://console.cloud.google.com/apis/library) (see [this](https://support.google.com/cloud/answer/6158841) for instructions how):
   1. Cloud Testing API
   2. Cloud Tool Results API
 
-### Find out the devices you want to test on
+### Find the devices you want to test on
+
 If you have [gcloud tool](https://cloud.google.com/sdk/gcloud/), you can run
 
 ```no-highlight
 gcloud beta firebase test ios models list
 ```
-This will return a list of supported devices and their identifiers.
 
-All available devices can also be seen [here](https://firebase.google.com/docs/test-lab/ios/available-testing-devices). 
+to get a list of supported devices and their identifiers.
 
+Alternatively all available devices can also be seen [here](https://firebase.google.com/docs/test-lab/ios/available-testing-devices). 
 
 ## Actions
 
 ### `firebase_test_lab_ios_xctest`
 
 Submit your iOS app to Firebase Test Lab and run XCTest. Refer to [this document](https://firebase.google.com/docs/test-lab/ios/command-line) for more details about Firebase Test Lab specific arguments.
+
 ```ruby
 scan(
   scheme: 'YourApp',                  # XCTest scheme
@@ -80,13 +85,13 @@ firebase_test_lab_ios_xctest(
 
 **Available parameters:**
 
-- `app_path` You may provide a different path in the local filesystem (e.g: `/path/to/app-bundle.zip`) or on Google Cloud Storage (`gs://your-bucket/path/to/app-bundle.zip`) that points to an app bundle as specified [here](https://firebase.google.com/docs/test-lab/ios/command-line#build_xctests_for_your_app). If a Google Cloud Storage path is used, the service account must have read access to such file.
-- `gcp_project` The Google Cloud project name for Firebase Test Lab to run on.
-- `oauth_key_file_path` The path to the Google Cloud service account key. If not set, the default credential will be used.
-- `devices` An array of devices for your app to be tested on. Each device is represented as a hash, with ios_model_id, ios_version_id, locale and orientation properties, the first two of which are required. If not set, it will be defaulted to iPhone X on iOS 11.2. This array cannot be empty.
-- `async` If set to true, the action will not wait for the test results but exit immediately.
-- `timeout_sec` After how long will the test be abandoned by Firebase Test Lab. Duration hould be given in seconds.
-- `result_storage` Designate which location on Google Cloud Storage to store the test results. This should be a directory (e.g: `gs://your-bucket/tests/`)
+- `app_path`: You may provide a different path in the local filesystem (e.g: `/path/to/app-bundle.zip`) or on Google Cloud Storage (`gs://your-bucket/path/to/app-bundle.zip`) that points to an app bundle as specified [here](https://firebase.google.com/docs/test-lab/ios/command-line#build_xctests_for_your_app). If a Google Cloud Storage path is used, the service account must have read access to such file.
+- `gcp_project`: The Google Cloud project name for Firebase Test Lab to run on.
+- `oauth_key_file_path`: The path to the Google Cloud service account key. If not set, the default credentials will be used.
+- `devices`: An array of devices for your app to be tested on. Each device is represented as a ruby hash, with `ios_model_id`, `ios_version_id`, `locale` and `orientation` properties, the first two of which are required. If not set, it will default to iPhone X on iOS 11.2. This array cannot be empty.
+- `async`: If set to true, the action will not wait for the test results but exit immediately.
+- `timeout_sec`: After how long will the test be abandoned by Firebase Test Lab. Duration should be given in seconds.
+- `result_storage`: Designate which location on Google Cloud Storage to store the test results. This should be a directory (e.g: `gs://your-bucket/tests/`)
 
 ## Issues and Feedback
 
