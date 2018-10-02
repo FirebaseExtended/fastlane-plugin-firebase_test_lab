@@ -14,6 +14,8 @@ fastlane add_plugin firebase_test_lab
 
 [Firebase Test Lab](https://firebase.google.com/docs/test-lab/) let you easily test your iOS app (Android support forthcoming) on a variety of real or virtual devices and configurations. This plugin allows you to submit your app to Firebase Test Lab by adding an action into Fastfile.
 
+<div style="text-align:center;"><img src="./testlab.png" width="400" align="middle" /></div>
+
 ## Getting started
 
 ### If you are not current user of Firebase
