@@ -13,6 +13,7 @@ module Fastlane
               UI.user_error!("app verification failed: There must be only one .xctestrun files in the ZIP file.")
             end
 
+            conf = Plist.parse_xml(xctestrun_files.first.get_input_stream)
             _, scheme_conf = conf.first
             unless scheme_conf["IsUITestBundle"]
               UI.user_error!("The app bundle is not a UI test bundle. Did you build with build-for-testing argument?")
