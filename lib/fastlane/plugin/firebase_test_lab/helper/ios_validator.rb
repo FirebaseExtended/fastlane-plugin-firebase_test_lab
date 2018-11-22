@@ -14,7 +14,14 @@ module Fastlane
             end
 
             conf = Plist.parse_xml(xctestrun_files.first.get_input_stream)
-            _, scheme_conf = conf.first
+            size = conf.size
+            if conf['__xctestrun_metadata__']
+              size -= 1
+            end  
+            unless size == 1
+                UI.user_error!("The app bundle may contain only one scheme, #{size} found")
+            end
+             _, scheme_conf = conf.first
             unless scheme_conf["IsUITestBundle"]
               UI.user_error!("The app bundle is not a UI test bundle. Did you build with build-for-testing argument?")
             end
