@@ -19,9 +19,9 @@ module Fastlane
               size -= 1
             end  
             unless size == 1
-                UI.user_error!("The app bundle may contain only one scheme, #{size} found")
+              UI.user_error!("The app bundle may contain only one scheme, #{size} found")
             end
-             _, scheme_conf = conf.first
+            _, scheme_conf = conf.first
             unless scheme_conf["IsUITestBundle"]
               UI.user_error!("The app bundle is not a UI test bundle. Did you build with build-for-testing argument?")
             end
