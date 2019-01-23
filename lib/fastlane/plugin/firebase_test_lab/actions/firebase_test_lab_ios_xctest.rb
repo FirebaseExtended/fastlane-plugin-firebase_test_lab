@@ -136,7 +136,8 @@ module Fastlane
             test_results = ftl_service.get_execution_steps(gcp_project, history_id, execution_id)
             tests_successful = extract_test_results(test_results, gcp_project, history_id, execution_id)
             unless executions_completed && tests_successful
-              UI.test_failure!("Tests failed")
+              UI.test_failure!("Tests failed. " \
+                "Go to #{firebase_console_link} for more information about this run")
             end
             return
           end
