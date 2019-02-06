@@ -50,11 +50,12 @@ module Fastlane
           upload_spinner.success("Done")
         end
 
+        UI.message("Submitting job(s) to Firebase Test Lab")
+        
         result_storage = (params[:result_storage] ||
           "gs://#{ftl_service.get_default_bucket(gcp_project)}/#{gcs_workfolder}")
         UI.message("Test Results bucket: #{result_storage}")
-
-        UI.message("Submitting job(s) to Firebase Test Lab")
+        
         # We have gathered all the information. Call Firebase Test Lab to start the job now
         matrix_id = ftl_service.start_job(gcp_project,
                                           app_gcs_link,
