@@ -23,6 +23,7 @@ module Fastlane
 
       def self.run(params)
         gcp_project = params[:gcp_project]
+        gcp_requests_timeout = params[:gcp_requests_timeout]
         oauth_key_file_path = params[:oauth_key_file_path]
         gcp_credential = Fastlane::FirebaseTestLab::Credential.new(key_file_path: oauth_key_file_path)
 
@@ -42,11 +43,13 @@ module Fastlane
           upload_spinner = TTY::Spinner.new("[:spinner] Uploading the app to GCS...", format: :dots)
           upload_spinner.auto_spin
           upload_bucket_name = ftl_service.get_default_bucket(gcp_project)
+          timeout = gcp_requests_timeout ? gcp_requests_timeout.to_i : nil
           app_gcs_link = upload_file(params[:app_path],
                                      upload_bucket_name,
                                      "#{gcs_workfolder}/#{DEFAULT_APP_BUNDLE_NAME}",
                                      gcp_project,
-                                     gcp_credential)
+                                     gcp_credential,
+                                     timeout)
           upload_spinner.success("Done")
         end
 
@@ -71,9 +74,9 @@ module Fastlane
         wait_for_test_results(ftl_service, gcp_project, matrix_id, params[:async])
       end
 
-      def self.upload_file(app_path, bucket_name, gcs_path, gcp_project, gcp_credential)
+      def self.upload_file(app_path, bucket_name, gcs_path, gcp_project, gcp_credential, gcp_requests_timeout)
         file_name = "gs://#{bucket_name}/#{gcs_path}"
-        storage = Fastlane::FirebaseTestLab::Storage.new(gcp_project, gcp_credential)
+        storage = Fastlane::FirebaseTestLab::Storage.new(gcp_project, gcp_credential, gcp_requests_timeout)
         storage.upload_file(File.expand_path(app_path), bucket_name, gcs_path)
         return file_name
       end
