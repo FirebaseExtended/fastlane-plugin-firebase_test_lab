@@ -8,10 +8,11 @@ module Fastlane
 
       private_constant :GCS_OAUTH_SCOPES
 
-      def initialize(gcp_project, credential)
+      def initialize(gcp_project, credential, gcp_requests_timeout)
         credentials = credential.get_google_credential(GCS_OAUTH_SCOPES)
         @client = Google::Cloud::Storage.new(project_id: gcp_project,
-                                             credentials: credentials)
+                                             credentials: credentials,
+                                             timeout: gcp_requests_timeout)
       end
 
       def upload_file(source_path, destination_bucket, destination_path)
