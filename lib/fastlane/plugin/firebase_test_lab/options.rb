@@ -75,7 +75,11 @@ module Fastlane
                                        verify_block: proc do |value|
                                          v = File.expand_path(value.to_s)
                                          UI.user_error!("Key file not found at path '#{v}'") unless File.exist?(v)
-                                       end)
+                                       end),
+          FastlaneCore::ConfigItem.new(key: :xcode_version,
+                                       description: "Xcode Version",
+                                       default_value: nil,
+                                       optional: true),
         ]
       end
 

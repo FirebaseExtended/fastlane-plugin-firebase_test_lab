@@ -80,7 +80,7 @@ module Fastlane
         end
       end
 
-      def start_job(gcp_project, app_path, result_path, devices, timeout_sec)
+      def start_job(gcp_project, app_path, result_path, devices, timeout_sec, xcode_version)
         body = {
           projectId: gcp_project,
           testSpecification: {
@@ -91,7 +91,8 @@ module Fastlane
             iosXcTest: {
               testsZip: {
                 gcsPath: app_path
-              }
+              },
+              xcodeVersion: xcode_version
             }
           },
           environmentMatrix: {

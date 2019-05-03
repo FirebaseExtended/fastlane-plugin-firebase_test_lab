@@ -53,7 +53,12 @@ module Fastlane
           upload_spinner.success("Done")
         end
 
-        UI.message("Submitting job(s) to Firebase Test Lab")
+        
+        if params[:xcode_version]
+          UI.message("Submitting job(s) to Firebase Test Lab #{params[:xcode_version]}")
+        else
+          UI.message("Submitting job(s) to Firebase Test Lab")
+        end 
         
         result_storage = (params[:result_storage] ||
           "gs://#{ftl_service.get_default_bucket(gcp_project)}/#{gcs_workfolder}")
@@ -64,7 +69,8 @@ module Fastlane
                                           app_gcs_link,
                                           result_storage,
                                           params[:devices],
-                                          params[:timeout_sec])
+                                          params[:timeout_sec],
+                                          params[:xcode_version])
 
         # In theory, matrix_id should be available. Keep it to catch unexpected Firebase Test Lab API response
         if matrix_id.nil?
