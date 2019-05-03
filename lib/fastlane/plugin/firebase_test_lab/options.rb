@@ -76,9 +76,11 @@ module Fastlane
                                          v = File.expand_path(value.to_s)
                                          UI.user_error!("Key file not found at path '#{v}'") unless File.exist?(v)
                                        end),
-          FastlaneCore::ConfigItem.new(key: :xcode_version,
-                                       description: "Xcode Version",
-                                       default_value: nil,
+          FastlaneCore::ConfigItem.new(key: :ios_xc_test_args,
+                                       description: "extra ios_xc_test_args useful for xcode version ie { xcodeVersion: '10.1' }" \
+                                                    "See IosXcTest https://testing.googleapis.com/$discovery/rest?version=v1",
+                                       default_value: {},
+                                       type: Hash,
                                        optional: true),
         ]
       end
