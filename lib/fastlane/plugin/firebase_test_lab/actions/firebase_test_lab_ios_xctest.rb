@@ -53,12 +53,7 @@ module Fastlane
           upload_spinner.success("Done")
         end
 
-        
-        if params[:xcode_version]
-          UI.message("Submitting job(s) to Firebase Test Lab #{params[:xcode_version]}")
-        else
-          UI.message("Submitting job(s) to Firebase Test Lab")
-        end 
+        UI.message("Submitting job(s) to Firebase Test Lab")
         
         result_storage = (params[:result_storage] ||
           "gs://#{ftl_service.get_default_bucket(gcp_project)}/#{gcs_workfolder}")
@@ -70,7 +65,7 @@ module Fastlane
                                           result_storage,
                                           params[:devices],
                                           params[:timeout_sec],
-                                          params[:xcode_version])
+                                          params[:ios_xc_test_args])
 
         # In theory, matrix_id should be available. Keep it to catch unexpected Firebase Test Lab API response
         if matrix_id.nil?
@@ -109,7 +104,7 @@ module Fastlane
 
               if async
                 UI.success("Job(s) have been submitted to Firebase Test Lab")
-                return
+                return firebase_console_link
               end
 
               spinner = TTY::Spinner.new("[:spinner] Waiting for results...", format: :dots)
@@ -150,7 +145,7 @@ module Fastlane
               UI.test_failure!("Tests failed. " \
                 "Go to #{firebase_console_link} for more information about this run")
             end
-            return
+            return firebase_console_link
           end
 
           # We should have caught all known states here. If the state is not one of them, this
