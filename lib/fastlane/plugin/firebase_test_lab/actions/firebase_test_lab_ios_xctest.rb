@@ -4,6 +4,7 @@ require_relative '../helper/storage'
 require_relative '../helper/credential'
 require_relative '../helper/ios_validator'
 require_relative '../options'
+require_relative '../commands'
 
 require 'json'
 require 'securerandom'
@@ -73,6 +74,7 @@ module Fastlane
         end
         UI.message("Matrix ID for this submission: #{matrix_id}")
         wait_for_test_results(ftl_service, gcp_project, matrix_id, params[:async])
+        download_files(result_storage, params)
       end
 
       def self.upload_file(app_path, bucket_name, gcs_path, gcp_project, gcp_credential, gcp_requests_timeout)
@@ -249,6 +251,45 @@ module Fastlane
           UI.error("😞  #{inconclusive_runs} step(s) yielded inconclusive outcomes.")
         end
         return failures == 0 && inconclusive_runs == 0
+      end
+
+      def self.download_files(result_storage, params)
+        @test_console_folderlist_output_file = "folderlist.txt"
+
+        if params[:download_results_from_firebase]
+          UI.message("Create firebase directory (if not exists) to store test results.")
+          FileUtils.mkdir_p(params[:output_dir])
+
+          if params[:download_file_list] && !params[:download_file_list].empty?
+            UI.message("Get files at bucket...")
+
+            params[:download_results_from_firebase] = false
+
+            Action.sh("#{Fastlane::Commands.list_object} "\
+                      "#{result_storage} "\
+                      "| grep -e '/$' > #{@test_console_folderlist_output_file}")
+
+            bucket_path = result_storage.delete_prefix("gs://")
+
+            device_folders = []
+            File.open(@test_console_folderlist_output_file).each do |line|
+              folder = line.match(%r{#{bucket_path}/(.*)/$}).captures.first
+              device_folders.push(folder)
+            end
+
+            defined_download_files = params[:download_file_list].split(" ")
+
+            device_folders.each do |devicefolder|
+              defined_download_files.each do |filename|
+                UI.message("Download file '#{filename}' from '#{devicefolder}' to '#{params[:output_dir]}/#{devicefolder}/#{filename}'...")
+                Action.sh("#{Fastlane::Commands.download_single_file} #{result_storage}/#{devicefolder}/#{filename} #{params[:output_dir]}/#{devicefolder}/#{filename}")
+              end
+            end
+          else
+            UI.message("Downloading instrumentation test results from Firebase Test Lab...")
+            Action.sh("#{Fastlane::Commands.download_results} #{result_storage} #{params[:output_dir]}")
+          end
+        end
       end
 
       #####################################################
