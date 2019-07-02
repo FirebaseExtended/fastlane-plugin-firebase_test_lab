@@ -79,7 +79,22 @@ module Fastlane
                                        verify_block: proc do |value|
                                          v = File.expand_path(value.to_s)
                                          UI.user_error!("Key file not found at path '#{v}'") unless File.exist?(v)
-                                       end)
+                                       end),
+          FastlaneCore::ConfigItem.new(key: :download_results_from_firebase,
+                                       description: "A flag to control if the firebase files should be downloaded from the bucket or not. Default: true",
+                                       is_string: false,
+                                       optional: true,
+                                       default_value: true),
+          FastlaneCore::ConfigItem.new(key: :download_file_list,
+                                       description: "A list of files that should be downloaded from the bucket or not, seperated by space. This is a additional parameter for 'download_results_from_firebase'. Default: empty string",
+                                       is_string: true,
+                                       optional: true,
+                                       default_value: ""),
+          FastlaneCore::ConfigItem.new(key: :output_dir,
+                                       description: "The directory to save the output results. Default: firebase",
+                                       is_string: true,
+                                       optional: true,
+                                       default_value: "firebase")                                                 
         ]
       end
 
