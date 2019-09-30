@@ -11,6 +11,10 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :gcp_requests_timeout,
                                        description: "The timeout (in seconds) to use for all Google Cloud requests (such as uploading your tests ZIP)",
                                        optional: true),
+          FastlaneCore::ConfigItem.new(key: :gcp_additional_client_info,
+                                       description: "A hash of additional client info you'd like to submit to Test Lab",
+                                       type: Hash,
+                                       optional: true),
           FastlaneCore::ConfigItem.new(key: :app_path,
                                        description: "Path to the app, either on the filesystem or GCS address (gs://)",
                                        default_value:

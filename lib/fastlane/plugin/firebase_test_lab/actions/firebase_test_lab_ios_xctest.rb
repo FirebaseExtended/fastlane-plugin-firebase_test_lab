@@ -64,7 +64,8 @@ module Fastlane
                                           app_gcs_link,
                                           result_storage,
                                           params[:devices],
-                                          params[:timeout_sec])
+                                          params[:timeout_sec],
+                                          params[:gcp_additional_client_info])
 
         # In theory, matrix_id should be available. Keep it to catch unexpected Firebase Test Lab API response
         if matrix_id.nil?

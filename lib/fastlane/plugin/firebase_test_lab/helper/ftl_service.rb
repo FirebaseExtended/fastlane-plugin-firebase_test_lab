@@ -80,7 +80,14 @@ module Fastlane
         end
       end
 
-      def start_job(gcp_project, app_path, result_path, devices, timeout_sec)
+      def start_job(gcp_project, app_path, result_path, devices, timeout_sec, additional_client_info)
+        if additional_client_info.nil? 
+          additional_client_info = { version: VERSION }
+        else
+          additional_client_info["version"] = VERSION
+        end
+        additional_client_info = additional_client_info.map { |k,v| { key: k, value: v } }
+
         body = {
           projectId: gcp_project,
           testSpecification: {
@@ -107,10 +114,7 @@ module Fastlane
           clientInfo: {
             name: PLUGIN_NAME,
             clientInfoDetails: [
-              {
-                key: "version",
-                value: VERSION
-              }
+              additional_client_info
             ]
           }
         }
