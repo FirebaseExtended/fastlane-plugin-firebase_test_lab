@@ -78,8 +78,7 @@ module Fastlane
           UI.abort_with_message!("No matrix ID received.")
         end
         UI.message("Matrix ID for this submission: #{matrix_id}")
-        wait_for_test_results(ftl_service, gcp_project, matrix_id, params[:async])
-        download_files(result_storage, params)
+        wait_for_test_results(ftl_service, gcp_project, matrix_id, params, result_storage)
       end
 
       def self.upload_file(app_path, bucket_name, gcs_path, gcp_project, gcp_credential, gcp_requests_timeout)
@@ -89,7 +88,7 @@ module Fastlane
         return file_name
       end
 
-      def self.wait_for_test_results(ftl_service, gcp_project, matrix_id, async)
+      def self.wait_for_test_results(ftl_service, gcp_project, matrix_id, params, result_storage)
         firebase_console_link = nil
 
         spinner = TTY::Spinner.new("[:spinner] Starting tests...", format: :dots)
@@ -109,7 +108,7 @@ module Fastlane
               spinner.success("Done")
               UI.message("Go to #{firebase_console_link} for more information about this run")
 
-              if async
+              if params[:async]
                 UI.success("Job(s) have been submitted to Firebase Test Lab")
                 return
               end
@@ -148,6 +147,7 @@ module Fastlane
             end
             test_results = ftl_service.get_execution_steps(gcp_project, history_id, execution_id)
             tests_successful = extract_test_results(test_results, gcp_project, history_id, execution_id)
+            download_files(result_storage, params)
             unless executions_completed && tests_successful
               UI.test_failure!("Tests failed. " \
                 "Go to #{firebase_console_link} for more information about this run")
