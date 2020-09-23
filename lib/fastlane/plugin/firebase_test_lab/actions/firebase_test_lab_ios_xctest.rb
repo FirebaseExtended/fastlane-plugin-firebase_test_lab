@@ -38,7 +38,12 @@ module Fastlane
           # gs:// is a path on Google Cloud Storage, we do not need to re-upload the app to a different bucket
           app_gcs_link = params[:app_path]
         else
-          FirebaseTestLab::IosValidator.validate_ios_app(params[:app_path])
+
+          if params[:skip_validation]
+            UI.message("Skipping validation of app.")
+          else
+            FirebaseTestLab::IosValidator.validate_ios_app(params[:app_path])
+          end
 
           # When given a local path, we upload the app bundle to Google Cloud Storage
           upload_spinner = TTY::Spinner.new("[:spinner] Uploading the app to GCS...", format: :dots)
