@@ -146,11 +146,11 @@ module Fastlane
               UI.abort_with_message!("Unexpected response from Firebase test lab: No history or execution ID")
             end
             test_results = ftl_service.get_execution_steps(gcp_project, history_id, execution_id)
-            tests_successful = extract_test_results(test_results, gcp_project, history_id, execution_id)
+            tests_successful, failureDictionary = extract_test_results(ftl_service, test_results, gcp_project, history_id, execution_id)
             download_files(result_storage, params)
             unless executions_completed && tests_successful
-              UI.test_failure!("Tests failed. " \
-                "Go to #{firebase_console_link} for more information about this run")
+              failureDictionary["FTL link"] = "Go to #{firebase_console_link} for more information about this run"
+              UI.test_failure!(failureDictionary)
             end
             return
           end
@@ -213,10 +213,11 @@ module Fastlane
         return failures == 0
       end
 
-      def self.extract_test_results(test_results, gcp_project, history_id, execution_id)
+      def self.extract_test_results(ftl_service, test_results, gcp_project, history_id, execution_id)
         steps = test_results["steps"]
         failures = 0
         inconclusive_runs = 0
+        failureDictionary = {}        
 
         UI.message("-------------------------")
         UI.message("|      TEST OUTCOME     |")
@@ -224,6 +225,34 @@ module Fastlane
           UI.message("-------------------------")
           step_id = step["stepId"]
           UI.message("Test step: #{step_id}")
+
+          device = ""
+          dimensionValues = step["dimensionValue"]
+          dimensionValues.each do |dimensionValue|
+            value = dimensionValue["value"]
+            device += value + " "
+          end
+          device.strip()
+          UI.message("#{device}")
+
+          test_cases = ftl_service.get_execution_test_cases(gcp_project, history_id, execution_id, step_id)
+
+          testCaseSummary = ""
+          testCases = test_cases["testCases"]
+          if !testCases.nil?
+            testCases.each do |testCase|
+              name = testCase["testCaseReference"]["name"]
+              status = testCase["status"]
+              if status.nil? 
+                testCaseSummary += ":white_check_mark: " + name + "\n"
+              else
+                testCaseSummary += ":fire: " + name + "\n"
+              end
+            end
+          else 
+            testCaseSummary += ":question: No test cases :question:"
+          end
+          UI.message(testCaseSummary)
 
           run_duration_sec = step["runDuration"]["seconds"] || 0
           UI.message("Execution time: #{run_duration_sec} seconds")
@@ -237,9 +266,11 @@ module Fastlane
           when "inconclusive"
             inconclusive_runs += 1
             UI.error("Result: #{outcome}")
+            failureDictionary[device] = testCaseSummary
           when "failure"
             failures += 1
             UI.error("Result: #{outcome}")
+            failureDictionary[device] = testCaseSummary
           end
           UI.message("For details, go to https://console.firebase.google.com/project/#{gcp_project}/testlab/" \
             "histories/#{history_id}/matrices/#{execution_id}/executions/#{step_id}")
@@ -255,7 +286,7 @@ module Fastlane
         if inconclusive_runs > 0
           UI.error("😞  #{inconclusive_runs} step(s) yielded inconclusive outcomes.")
         end
-        return failures == 0 && inconclusive_runs == 0
+        return (failures == 0 && inconclusive_runs == 0), failureDictionary
       end
 
       def self.download_files(result_storage, params)

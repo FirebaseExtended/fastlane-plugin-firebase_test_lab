@@ -1,6 +1,6 @@
 module Fastlane
   module FirebaseTestLab
-    VERSION = "1.0.8"
+    VERSION = "1.0.9"
     PLUGIN_NAME = "fastlane-plugin-firebase_test_lab"
   end
 end
