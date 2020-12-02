@@ -98,7 +98,12 @@ module Fastlane
                                        description: "The directory to save the output results. Default: firebase",
                                        is_string: true,
                                        optional: true,
-                                       default_value: "firebase")                                                 
+                                       default_value: "firebase"),
+          FastlaneCore::ConfigItem.new(key: :xcode_version,
+                                       description: "Xcode version to be used by Firebase TestLab (if not filled then default will be used",
+                                       is_string: true,
+                                       default_value: nil,
+                                       optional: true)
         ]
       end
 

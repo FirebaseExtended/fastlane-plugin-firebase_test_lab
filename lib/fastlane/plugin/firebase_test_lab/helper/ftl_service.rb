@@ -86,13 +86,23 @@ module Fastlane
         end
       end
 
-      def start_job(gcp_project, app_path, result_path, devices, timeout_sec, additional_client_info)
+      def start_job(gcp_project, app_path, result_path, devices, timeout_sec, additional_client_info, xcode_version)
         if additional_client_info.nil? 
           additional_client_info = { version: VERSION }
         else
           additional_client_info["version"] = VERSION
         end
         additional_client_info = additional_client_info.map { |k,v| { key: k, value: v } }
+
+        ios_xc_test_hash = {
+          testsZip: {
+            gcsPath: app_path
+          }
+        }
+
+        if !xcode_version.nil?
+          ios_xc_test_hash.merge!({ xcodeVersion: xcode_version})
+        end
 
         body = {
           projectId: gcp_project,
@@ -101,11 +111,7 @@ module Fastlane
               seconds: timeout_sec
             },
             iosTestSetup: {},
-            iosXcTest: {
-              testsZip: {
-                gcsPath: app_path
-              }
-            }
+            iosXcTest: ios_xc_test_hash
           },
           environmentMatrix: {
             iosDeviceList: {
