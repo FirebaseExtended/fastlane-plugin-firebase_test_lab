@@ -21,7 +21,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency('googleauth')
   spec.add_dependency('rubyzip', '>= 1.0.0')
   spec.add_dependency('plist', '>= 3.0.0')
-  spec.add_dependency('google-cloud-storage', '>= 1.25.1', '<2.0.0')
+  spec.add_dependency('google-cloud-storage', '>= 1.31', '<2.0.0')
   spec.add_dependency('tty-spinner', '>= 0.8.0', '< 1.0.0')
 
   spec.add_development_dependency('bundler')
